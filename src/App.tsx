@@ -1,18 +1,15 @@
-import { Button } from '@mantine/core';
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import logo from './logo.svg';
+import { ROUTES } from './constants/routes';
+import { AuthenticationForm } from './pages/AuthenticationForm';
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <Button>Test</Button>
-      </header>
-    </div>
+    <Routes>
+      <Route path={ROUTES.HOME} element={<HomePage />} />
+      <Route path={ROUTES.LOGIN} element={<AuthenticationForm />} />
+    </Routes>
   );
 }
 
