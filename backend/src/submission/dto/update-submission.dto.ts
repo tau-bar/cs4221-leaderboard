@@ -1,4 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSubmissionDto } from './create-submission.dto';
-
-export class UpdateSubmissionDto extends PartialType(CreateSubmissionDto) {}
+export class UpdateSubmissionDto {
+    readonly student_id: number;
+    readonly question_id: number;
+    readonly submission_time: Date;
+    readonly is_correct: boolean;
+    readonly planning_time: number;
+    readonly execution_time: number;
+    readonly query: string;
+    readonly status: string;
+}

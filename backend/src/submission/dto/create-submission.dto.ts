@@ -1,7 +1,6 @@
 export class CreateSubmissionDto {
     readonly student_id: number;
     readonly question_id: number;
-    readonly submission_time: Date;
     readonly is_correct: boolean;
     readonly planning_time: number;
     readonly execution_time: number;
@@ -16,7 +15,6 @@ export class CreateSubmissionDto {
         execution_time: number, 
         query: string, 
         status: string,
-        submission_time: Date // optional parameter
     ) {
         this.student_id = student_id;
         this.question_id = question_id;
@@ -25,8 +23,5 @@ export class CreateSubmissionDto {
         this.execution_time = execution_time;
         this.query = query;
         this.status = status;
-        if (submission_time != undefined) {
-            this.submission_time = submission_time;
-        }
     }
 }
