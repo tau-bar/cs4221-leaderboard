@@ -49,9 +49,7 @@ export function AuthenticationForm(props: PaperProps) {
         </Text>
 
         <Group grow mb="md" mt="md">
-          <GoogleButton onClick={() => login()} radius="xl">
-            Google
-          </GoogleButton>
+          <GoogleButton onClick={() => login()}>Google</GoogleButton>
         </Group>
       </Paper>
     </Flex>
