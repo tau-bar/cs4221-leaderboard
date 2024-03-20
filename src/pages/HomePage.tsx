@@ -1,39 +1,19 @@
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { googleLogout } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../constants/routes';
+import { useTokenStore } from '../store/tokenStore';
+import { useUserStore } from '../store/userStore';
 
 const HomePage = () => {
-  const [user, setUser] = useState<any>([]);
-  const [profile, setProfile] = useState<any>([]);
+  const { setAccessToken } = useTokenStore();
+  const { profile, setProfile } = useUserStore();
+  const navigate = useNavigate();
 
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => setUser(codeResponse),
-    onError: (error) => console.log('Login Failed:', error),
-  });
-
-  useEffect(() => {
-    if (user) {
-      axios
-        .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.access_token}`,
-              Accept: 'application/json',
-            },
-          },
-        )
-        .then((res) => {
-          setProfile(res.data);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [user]);
-
-  // log out function to log the user out of google and set the profile array to null
   const logOut = () => {
     googleLogout();
+    setAccessToken('');
     setProfile(null);
+    navigate(ROUTES.LOGIN);
   };
 
   return (
@@ -52,7 +32,7 @@ const HomePage = () => {
           <button onClick={logOut}>Log out</button>
         </div>
       ) : (
-        <button onClick={() => login()}>Sign in with Google 🚀 </button>
+        <button>Sign in with Google 🚀 </button>
       )}
     </div>
   );
