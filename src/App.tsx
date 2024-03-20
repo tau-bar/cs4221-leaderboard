@@ -1,18 +1,30 @@
-import { Button } from '@mantine/core';
+import { Flex } from '@mantine/core';
+import { Outlet, Route, Routes } from 'react-router-dom';
 import './App.css';
-import logo from './logo.svg';
+import Navbar from './components/Navbar';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { ROUTES } from './constants/routes';
+import { AuthenticationForm } from './pages/AuthenticationForm';
+import { StudentRoutes } from './routers/StudentRouters';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <Button>Test</Button>
-      </header>
-    </div>
+    <Routes>
+      <Route path={ROUTES.LOGIN} element={<AuthenticationForm />} />
+
+      <Route
+        element={
+          <ProtectedRoute>
+            <Flex direction={'row'}>
+              <Navbar />
+              <Outlet />
+            </Flex>
+          </ProtectedRoute>
+        }
+      >
+        {StudentRoutes}
+      </Route>
+    </Routes>
   );
 }
 
