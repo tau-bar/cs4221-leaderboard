@@ -2,7 +2,7 @@ import { Route } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import HomePage from '../pages/HomePage';
 import { Question } from '../pages/Question';
-import { Leaderboard } from '../pages/Leaderboard';
+import Leaderboard from '../pages/Leaderboard';
 
 export const StudentRoutes = [
   <Route key={ROUTES.HOME} path={ROUTES.HOME} element={<HomePage />} />,
