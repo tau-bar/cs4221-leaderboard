@@ -1,11 +1,4 @@
-export class UpdateStudentDto {
-    readonly id: number;
-    readonly name: string;
-    readonly email: string;
+import { PartialType } from "@nestjs/mapped-types";
+import { StudentDto } from "./student.dto";
 
-    constructor(id: number, name: string, email: string) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
-}
+export class UpdateStudentDto extends PartialType(StudentDto) {}

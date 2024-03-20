@@ -1,7 +1,4 @@
-export class CreateQuestionDto {
-    readonly description: string;
-    readonly question_schema: string;
-    readonly question_data: string;
-    readonly answer_data: string;
-    readonly max_timeout: number;
-}
+import { OmitType } from "@nestjs/mapped-types";
+import { QuestionDto } from "./question.dto";
+
+export class CreateQuestionDto extends OmitType(QuestionDto, ['id']) {}
