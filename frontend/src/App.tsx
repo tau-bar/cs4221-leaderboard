@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
@@ -22,6 +22,8 @@ function App() {
       >
         {StudentRoutes}
       </Route>
+
+      <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
     </Routes>
   );
 }
