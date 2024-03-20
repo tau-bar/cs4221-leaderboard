@@ -1,11 +1,10 @@
-import { Flex } from '@mantine/core';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import './App.css';
-import Navbar from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
 import { AuthenticationForm } from './pages/AuthenticationForm';
 import { StudentRoutes } from './routers/StudentRouters';
+import { Layout } from './components/Layout';
 
 function App() {
   return (
@@ -15,10 +14,9 @@ function App() {
       <Route
         element={
           <ProtectedRoute>
-            <Flex direction={'row'}>
-              <Navbar />
+            <Layout>
               <Outlet />
-            </Flex>
+            </Layout>
           </ProtectedRoute>
         }
       >
