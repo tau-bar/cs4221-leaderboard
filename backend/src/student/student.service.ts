@@ -3,7 +3,7 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from './entities/student.entity';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class StudentService {
@@ -19,7 +19,7 @@ export class StudentService {
     return await this.studentRepository.find();
   }
 
-  async findOne(id: number): Promise<Student> {
+  async findByKey(id: number): Promise<Student> {
     return await this.studentRepository.findOne({
       where: {
         id: id
@@ -27,8 +27,8 @@ export class StudentService {
     });
   }
 
-  async update(id: number, updateStudentDto: UpdateStudentDto): Promise<Student> {
-    return await this.studentRepository.save(updateStudentDto);
+  async update(id: number, updateStudentDto: UpdateStudentDto): Promise<UpdateResult> {
+    return await this.studentRepository.update(id, updateStudentDto);
   }
 
   async remove(id: number): Promise<DeleteResult> {
