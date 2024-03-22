@@ -1,7 +1,8 @@
 import { Question } from "src/question/entities/question.entity";
 import { Student } from "src/student/entities/student.entity";
-import { Column, CreateDateColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
+@Entity("admin.submission")
 export class Submission {
     @PrimaryColumn({ type: "int8" })
     student_id: number;
@@ -9,7 +10,7 @@ export class Submission {
     @PrimaryColumn({ type: "int8" })
     question_id: number;
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    @PrimaryColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP(6)" })
     submission_time: Date;
 
     @Column("bool", { nullable: false, default: false })
@@ -28,8 +29,10 @@ export class Submission {
     status: string;
 
     @ManyToOne(() => Student, (student) => student.id, { nullable: false, eager: false, cascade: false })
+    @JoinColumn({ name: "student_id", referencedColumnName: "id" })
     student: Student;
 
     @ManyToOne(() => Question, (question) => question.id, { nullable: false, eager: false, cascade: false })
+    @JoinColumn({ name: "question_id", referencedColumnName: "id" })
     question: Question;
 }
