@@ -10,7 +10,7 @@ export class Submission {
     @PrimaryColumn({ type: "int8" })
     question_id: number;
 
-    @PrimaryColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP(6)" })
+    @PrimaryColumn({ type: "timestamptz", precision: 3, default: () => "CURRENT_TIMESTAMP(3)" })
     submission_time: Date;
 
     @Column("bool", { nullable: false, default: false })
