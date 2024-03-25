@@ -42,7 +42,7 @@ export async function getSubmissions(
     {
       student_id: student_id,
       question_id: question_id,
-      submission_time: new Date('2024-03-25T08:00:00Z'),
+      submission_time: new Date('2024-03-23T08:00:00Z'),
       is_correct: true,
       planning_time: 5,
       execution_time: 10,
@@ -52,7 +52,7 @@ export async function getSubmissions(
     {
       student_id: student_id,
       question_id: question_id,
-      submission_time: new Date('2024-03-25T08:05:00Z'),
+      submission_time: new Date('2024-03-23T08:05:00Z'),
       is_correct: false,
       planning_time: 3,
       execution_time: 15,
@@ -62,7 +62,7 @@ export async function getSubmissions(
     {
       student_id: student_id,
       question_id: question_id,
-      submission_time: new Date('2024-03-25T08:10:00Z'),
+      submission_time: new Date('2024-03-23T08:10:00Z'),
       is_correct: true,
       planning_time: 7,
       execution_time: 8,
@@ -72,7 +72,7 @@ export async function getSubmissions(
     {
       student_id: student_id,
       question_id: question_id,
-      submission_time: new Date('2024-03-25T08:15:00Z'),
+      submission_time: new Date('2024-03-23T08:15:00Z'),
       is_correct: true,
       planning_time: 4,
       execution_time: 12,
@@ -82,7 +82,7 @@ export async function getSubmissions(
     {
       student_id: student_id,
       question_id: question_id,
-      submission_time: new Date('2024-03-25T08:20:00Z'),
+      submission_time: new Date('2024-03-23T08:20:00Z'),
       is_correct: false,
       planning_time: 6,
       execution_time: 20,

@@ -13,6 +13,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconCopy } from '@tabler/icons-react';
+import { DateTime } from 'luxon';
 
 import { useUserStore } from '../store/userStore';
 import type { SubmissionDto } from '../types/question';
@@ -68,7 +69,9 @@ export default function QuestionSubmissions() {
       <Table.Td>
         <QueryDisplay query={submission.query} />
       </Table.Td>
-      <Table.Td>{submission.submission_time.toISOString()}</Table.Td>
+      <Table.Td>
+        {DateTime.fromJSDate(submission.submission_time).toRelative()}
+      </Table.Td>
       <Table.Td>
         <Badge
           color={
@@ -116,7 +119,7 @@ export default function QuestionSubmissions() {
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Query</Table.Th>
-            <Table.Th>Submission Time</Table.Th>
+            <Table.Th>Submitted</Table.Th>
             <Table.Th>Status</Table.Th>
             <Table.Th>Correctness</Table.Th>
             <Table.Th>Planning Time</Table.Th>
