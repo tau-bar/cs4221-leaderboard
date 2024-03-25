@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
   Flex,
@@ -16,8 +16,9 @@ import { ROUTES } from '../constants/routes';
 import { getQuestion, submitQuery } from '../api/question';
 import type { QuestionDto } from '../types/question';
 
-export function Question() {
+export default function Question() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [question, setQuestion] = useState<QuestionDto | null>(null);
   const [query, setQuery] = useState('-- write your query here\n\n');
@@ -40,9 +41,14 @@ export function Question() {
     submitQuery(Number.parseInt(id), query).then((success) => {
       if (success) {
         notifications.show({
-          message: 'Query submitted successfully',
+          title: 'Query submitted successfully',
+          message: 'Redirecting...',
           color: 'green',
         });
+        setTimeout(
+          () => navigate(ROUTES.QUESTION_SUBMISSIONS.replace(':id', id)),
+          1000,
+        );
       } else {
         notifications.show({
           message: 'Failed to submit query',

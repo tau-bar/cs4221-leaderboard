@@ -3,5 +3,6 @@ export const ROUTES = {
   LOGIN: '/login',
   PROFILE: '/profile',
   QUESTION: '/question/:id',
+  QUESTION_SUBMISSIONS: '/question/:id/submissions',
   LEADERBOARD: '/leaderboard/:id',
 };
