@@ -12,4 +12,14 @@ export class QuestionController {
   ) {
     return await this.questionService.getList(page, limit);
   }
+
+  @Get(':id')
+  async getQuestion(@Query('id') id: number) {
+    return await this.questionService.findByKey(id);
+  }
+
+  @Get('all')
+  async getAllQuestions() {
+    return await this.questionService.findAll();
+  }
 }
