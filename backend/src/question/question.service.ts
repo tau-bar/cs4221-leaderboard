@@ -8,8 +8,9 @@ import { Question } from './entities/question.entity';
 @Injectable()
 export class QuestionService {
   constructor(
-    @InjectDataSource("admin") private readonly dataSource: DataSource,
-    @InjectRepository(Question, "admin") private readonly questionRepository: Repository<Question>
+    @InjectDataSource('admin') private readonly dataSource: DataSource,
+    @InjectRepository(Question, 'admin')
+    private readonly questionRepository: Repository<Question>,
   ) {}
 
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
@@ -20,15 +21,25 @@ export class QuestionService {
     return await this.questionRepository.find();
   }
 
+  async getList(page: number, limit: number): Promise<Question[]> {
+    return await this.questionRepository.find({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  }
+
   async findByKey(id: number): Promise<Question> {
     return await this.questionRepository.findOne({
       where: {
-        id: id
-      }
-    })
+        id: id,
+      },
+    });
   }
 
-  async update(id: number, updateQuestionDto: UpdateQuestionDto): Promise<UpdateResult> {
+  async update(
+    id: number,
+    updateQuestionDto: UpdateQuestionDto,
+  ): Promise<UpdateResult> {
     return await this.questionRepository.update(id, updateQuestionDto);
   }
 
