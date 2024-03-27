@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: Leaderboard API
+  description: API to manage the leaderboard
+  version: 0.0.1
+servers:
+  - url: http://localhost:3000
+    description: Development server
+paths:
+  /admin/setup:
+    post:
+      summary: Sets up a question
+      description: Runs the schema initialization and data population scripts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_id:
+                  type: string
+                  description: id of question to be set up
+                  example: 1
+      responses:
+        '201':
+          description: schema initialized and data populated for the question
+  /admin/submission:
+    get:
+      summary: Get a submission
+      description: Returns a submission
+      parameters:
+        - name: student_id
+          in: query
+          schema:
+            type: string
+          required: true
+          description: id of the student
+          example: 1
+        - name: question_id
+          in: query
+          schema:
+            type: string
+          required: true
+          description: id of the question
+          example: 1
+        - name: submission_time
+          in: query
+          schema:
+            type: string
+          required: true
+          description: time of submission
+          example: 2024-03-27T15:31:57.094Z
+      responses:
+        '200':
+          description: submissions returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Submission'
+  /admin/submit:
+    post:
+      summary: Submit a query for evaluation
+      description: Creates a submission for a student's query and queues it for 
+        performance and correctness evaluation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: string
+                  description: id of the student
+                  example: 1
+                question_id:
+                  type: string
+                  description: id of the question
+                  example: 1
+                query:
+                  type: string
+                  description: query submitted
+                  example: SELECT * FROM test;
+      responses:
+        '201':
+          description: submission created and query queued for evaluation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitDto'
+
+components:
+  schemas:
+    Submission:
+      type: object
+      properties:
+        student_id:
+          type: string
+          description: id of the student
+          example: 1
+        question_id:
+          type: string
+          description: id of the question
+          example: 1
+        submission_time:
+          type: string
+          description: time of submission
+          example: 2024-03-27T15:31:57.094Z
+        is_correct:
+          type: boolean
+          description: whether the submission is correct
+          example: true
+        planning_time:
+          type: string
+          description: time taken to plan the submission
+          example: 0.231
+        execution_time:
+          type: string
+          description: time taken to execute the submission
+          example: 0.061
+        query:
+          type: string
+          description: query submitted
+          example: SELECT * FROM test;
+        status:
+          type: string
+          enum: [COMPLETED, PENDING, TIMEOUT, FAILED]
+          description: status of the submission
+          example: COMPLETED
+    SubmitDto:
+      type: object
+      properties:
+        student_id:
+          type: string
+          description: id of the student
+          example: 1
+        question_id:
+          type: string
+          description: id of the question
+          example: 1
+        submission_time:
+          type: string
+          description: time of submission
+          example: 2024-03-27T15:31:57.094Z
+        query:
+          type: string
+          description: query submitted
+          example: SELECT * FROM test;
+        status:
+          type: string
+          enum: [COMPLETED, PENDING, TIMEOUT, FAILED]
+          description: status of the submission
+          example: PENDING
+
+      
