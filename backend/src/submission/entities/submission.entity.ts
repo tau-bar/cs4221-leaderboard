@@ -3,7 +3,7 @@ import { Student } from "src/student/entities/student.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { SubmissionKeyDto } from "../dto/submission-key.dto";
 
-@Entity("admin.submission")
+@Entity({ schema: "admin", name: "submission" })
 export class Submission {
     @PrimaryColumn({ type: "int8" })
     student_id: number;
