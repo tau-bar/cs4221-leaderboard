@@ -46,4 +46,8 @@ export class QuestionService {
   async remove(id: number): Promise<DeleteResult> {
     return await this.questionRepository.delete(id);
   }
+
+  async getQuestionCount(): Promise<number> {
+    return await this.questionRepository.count();
+  }
 }

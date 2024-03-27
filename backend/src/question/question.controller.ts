@@ -5,12 +5,17 @@ import { QuestionService } from './question.service';
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
-  @Get()
+  @Get('list')
   async getQuestions(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
     return await this.questionService.getList(page, limit);
+  }
+
+  @Get('/count')
+  async getQuestionCount() {
+    return await this.questionService.getQuestionCount();
   }
 
   @Get(':id')

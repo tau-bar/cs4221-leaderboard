@@ -2,14 +2,26 @@ import { Anchor, Flex, Pagination, Table, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { ROUTES } from '../constants/routes';
 import { QuestionDto } from '../types/question';
-import { getQuestions } from '../api/questions';
+import { getQuestionCount, getQuestions } from '../api/questions';
 
 const HomePage = () => {
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   // TODO: Fetch questions from the backend once seeding fully implemented
+  const [totalQuestionCount, setTotalQuestionCount] = useState(0);
   const [questions, setQuestions] = useState<QuestionDto[]>([]);
+
+  useEffect(() => {
+    getQuestionCount()
+      .then((data) => {
+        setTotalQuestionCount(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching question count:', error);
+      });
+  }, []);
+
   useEffect(() => {
     getQuestions(currentPage)
       .then((data) => {
@@ -18,7 +30,7 @@ const HomePage = () => {
       .catch((error) => {
         console.error('Error fetching questions:', error);
       });
-  }, []);
+  }, [currentPage]);
 
   // const questions: QuestionDto[] = [
   //   {
@@ -153,7 +165,7 @@ const HomePage = () => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
         <Pagination
-          total={Math.ceil(questions.length / ITEMS_PER_PAGE)}
+          total={Math.ceil(totalQuestionCount / ITEMS_PER_PAGE)}
           value={currentPage}
           onChange={setCurrentPage}
         />
