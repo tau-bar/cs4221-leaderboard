@@ -63,7 +63,7 @@ paths:
   /admin/submissions:
     get:
       summary: Get all submissions
-      description: Returns all submissions
+      description: Returns all submissions in descending order of submission time
       parameters:
         - name: student_id
           in: query

@@ -39,7 +39,7 @@ export class AdminService {
   }
 
   async getAllSubmissions(student_id: number, question_id: number): Promise<SubmissionDto[]> {
-    return this.submissionService.findByStudentIdAndQuestionId(student_id, question_id);
+    return this.submissionService.findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id, question_id);
   }
 
   async queueSubmissionEvaluation(createSubmissionDto: CreateSubmissionDto): Promise<SubmissionDto> {
