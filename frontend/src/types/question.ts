@@ -1,6 +1,7 @@
 export type QuestionDto = {
   id: number;
-  name: string;
+  question_name: string;
+  schema_name: string;
   description: string;
   question_schema: string;
   question_data: string;

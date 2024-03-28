@@ -16,12 +16,14 @@ import { ROUTES } from '../constants/routes';
 import { getQuestion, submitQuery } from '../api/question';
 import type { QuestionDto } from '../types/question';
 import { IconDownload, IconTrophy } from '@tabler/icons-react';
+import { AnswerTable } from './AnswerTable';
 
 export default function Question() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [question, setQuestion] = useState<QuestionDto | null>(null);
+  const [answer, setAnswer] = useState<Record<string, string>[]>([]);
   const [query, setQuery] = useState('-- write your query here\n\n');
   const { colorScheme } = useMantineColorScheme();
 
@@ -29,6 +31,8 @@ export default function Question() {
     if (!id) return;
     getQuestion(Number.parseInt(id)).then((question) => {
       setQuestion(question);
+      const answerData = JSON.parse(question?.answer_data ?? '[]');
+      setAnswer(answerData.slice(0, 5));
       setLoading(false);
     });
   }, [id]);
@@ -88,7 +92,8 @@ export default function Question() {
     <Flex align="stretch" h="80vh" gap="md">
       <Stack flex={1} justify="space-between">
         <Stack>
-          <Title order={2}>{question.name}</Title>
+          <Title order={2}>{question.question_name}</Title>
+          <Text>{question.description}</Text>
           <Flex gap="sm">
             <Button
               rightSection={<IconDownload size={14} />}
@@ -105,10 +110,8 @@ export default function Question() {
               Sample data
             </Button>
           </Flex>
-          <Text>{question.description}</Text>
-          <Text>{question.question_schema}</Text>
-          <Text>{question.question_data}</Text>
-          <Text>{question.answer_data}</Text>
+          <Text>Sample answer (truncated to 5 rows)</Text>
+          <AnswerTable data={answer} />
           <Text>Max timeout: {question.max_timeout}s</Text>
         </Stack>
         <Link to={ROUTES.LEADERBOARD.replace(':id', id ?? '')}>

@@ -1,37 +1,28 @@
+import axios from 'axios';
 import type { QuestionDto, SubmissionDto } from '../types/question';
 
+const API_URL = process.env.REACT_APP_API_URL || 'localhost:3000';
+
 export async function getQuestion(id: number): Promise<QuestionDto | null> {
-  return {
-    id: id,
-    name: `Question ${id}`,
-    description: `Description for Question ${id}`,
-    question_schema: `Schema for Question ${id}`,
-    question_data: `Data for Question ${id}`,
-    answer_data: `Answer Data for Question ${id}`,
-    max_timeout: 60,
-  };
-  // TODO: backend integration
-  // const response = await fetch(`/api/question/${id}`);
-  // return response.json();
+  const resp = await axios.get<QuestionDto>(`${API_URL}/question/${id}`);
+  return resp.data;
 }
 
-export async function submitQuery(id: number, query: string): Promise<boolean> {
-  console.log(`Submitted ${query} for question ${id}`);
-  return true;
-  // TODO: backend integration
-  // const response = await fetch(`/api/question/${id}/submit`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify({ query }),
-  // });
-  // return response.ok;
+export async function submitQuery(
+  question_id: number,
+  query: string,
+): Promise<SubmissionDto> {
+  const resp = await axios.post<SubmissionDto>(`${API_URL}/admin/submit`, {
+    student_id: 1, // TODO: remove hardcoding
+    question_id: 2, // TODO: remove hardcoding
+    query: query,
+  });
+  return resp.data;
 }
 
 export enum QuestionStatus {
-  PENDING = 'pending',
-  COMPLETED = 'completed',
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
 }
 
 export async function getSubmissions(
