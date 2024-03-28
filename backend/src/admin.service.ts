@@ -77,8 +77,8 @@ export class AdminService {
 
       // parse planning and execution time from query plan
       if (analysis != null) {
-        submission.planning_time = parseFloat(analysis[1]["QUERY PLAN"].substring(15, 20));
-        submission.execution_time = parseFloat(analysis[2]["QUERY PLAN"].substring(16, 21));
+        submission.planning_time = parseFloat(analysis[analysis.length - 2]["QUERY PLAN"].substring(15, 20));
+        submission.execution_time = parseFloat(analysis[analysis.length - 1]["QUERY PLAN"].substring(16, 21));
       }
 
       let is_correct = false;
