@@ -20,8 +20,10 @@ export class AdminService {
     await queryRunner.connect();
     await queryRunner.query(`CREATE SCHEMA ${name}`);
     await queryRunner.query(`alter default privileges for role ${process.env.ADMIN_USERNAME} in schema ${name} grant select on tables to ${process.env.PARTICIPANT_USERNAME};`);
+    await queryRunner.query(`SET LOCAL SEARCH_PATH=${name}`);
     await queryRunner.query(question_schema);
     await queryRunner.query(question_data);
+    await queryRunner.query(`SET LOCAL SEARCH_PATH=public`);
     await queryRunner.release();
   }
 }
