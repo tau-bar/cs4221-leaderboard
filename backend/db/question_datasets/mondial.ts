@@ -181,7 +181,6 @@ CREATE TYPE GeoCoord AS
 (Latitude DECIMAL,
  Longitude DECIMAL);
 
-
 CREATE TABLE Mountain
 (Name VARCHAR(50) CONSTRAINT MountainKey PRIMARY KEY,
  Mountains VARCHAR(50),
@@ -367,7 +366,7 @@ CREATE TABLE Airport
    CHECK ((Longitude >= -180) AND (Longitude <= 180)) ,
  Elevation DECIMAL ,
  gmtOffset DECIMAL );
-`
+`.replace(/CREATE TABLE (\w+)/g, (match, tableName) => `CREATE TABLE ${tableName.toLowerCase()}`).replace(/REFERENCES (\w+)/g, (match, tableName) => `REFERENCES ${tableName.toLowerCase()}`);
 
 export const mondialData = ` INSERT INTO country VALUES ('Albania','AL','Tirana','Albania',28750,2821977);
 INSERT INTO country VALUES ('Greece','GR','Athina','Attikis',131940,10816286);
@@ -52291,4 +52290,4 @@ INSERT INTO airport VALUES ('NLA','Ndola','Z','Ndola','Copperbelt',NULL,-12.9981
 INSERT INTO airport VALUES ('LUN','Lusaka Intl','Z','Lusaka','Lusaka',NULL,-15.330817,28.452628,1152,2);
 INSERT INTO airport VALUES ('BUQ','J M Nkomo Intl','ZW','Bulawayo','Zimbabwe',NULL,-20.017431,28.617869,1329,2);
 INSERT INTO airport VALUES ('HRE','Harare Intl','ZW','Harare','Zimbabwe',NULL,-17.931806,31.092847,1490,2);
-`
+`.replace(/INSERT INTO (\w+)/g, (match, tableName) => `INSERT INTO ${tableName.toLowerCase()}`)

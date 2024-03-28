@@ -4,15 +4,19 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Question } from './entities/question.entity';
+import { AdminService } from 'src/admin.service';
 
 @Injectable()
 export class QuestionService {
   constructor(
     @InjectDataSource("admin") private readonly dataSource: DataSource,
-    @InjectRepository(Question, "admin") private readonly questionRepository: Repository<Question>
-  ) {}
+    @InjectRepository(Question, "admin") private readonly questionRepository: Repository<Question>,
+    private readonly adminService: AdminService
+  ) { }
 
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
+    const { name, question_schema, question_data } = createQuestionDto;
+    await this.adminService.setupQuestion(name, question_schema, question_data);
     return await this.questionRepository.save(createQuestionDto);
   }
 
