@@ -86,7 +86,6 @@ export class AdminService {
       for (let i = 0; i < result.length; i++) {
         const actual_row = result[i];
         const expected_row = question.answer_data[i];
-        console.log(actual_row, expected_row);
         const keys = Object.keys(expected_row);
         let is_row_correct = true;
         for (let key of keys) {
