@@ -58,6 +58,7 @@ export class AdminService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
         // set statement timeout for transaction
+        await queryRunner.query(`SET LOCAL SEARCH_PATH = ${question.schema_name}`)
         await queryRunner.query(`SET LOCAL statement_timeout='${question.max_timeout}ms';`);
         // get query plan
         analysis = await queryRunner.query(`EXPLAIN ANALYZE ${submission.query}`);
