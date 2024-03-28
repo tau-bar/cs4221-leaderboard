@@ -38,6 +38,10 @@ export class AdminService {
     return this.submissionService.findByKey(key);
   }
 
+  async getAllSubmissions(student_id: number, question_id: number): Promise<SubmissionDto[]> {
+    return this.submissionService.findByStudentIdAndQuestionId(student_id, question_id);
+  }
+
   async queueSubmissionEvaluation(createSubmissionDto: CreateSubmissionDto): Promise<SubmissionDto> {
     const submission = await this.submissionService.create(createSubmissionDto);
     const question = await this.questionService.findByKey(submission.question_id);

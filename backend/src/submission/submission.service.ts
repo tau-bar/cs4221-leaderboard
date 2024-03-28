@@ -20,6 +20,15 @@ export class SubmissionService {
     return await this.submissionRepository.find();
   }
 
+  async findByStudentIdAndQuestionId(student_id: number, question_id: number): Promise<Submission[]> {
+    return await this.submissionRepository.find({
+      where: {
+        student_id: student_id,
+        question_id: question_id
+      }
+    });
+  }
+
   async findByKey(key: SubmissionKeyDto): Promise<Submission> {
     return await this.submissionRepository.findOne({
       where: {

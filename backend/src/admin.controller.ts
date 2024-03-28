@@ -21,6 +21,14 @@ export class AdminController {
     });
   }
 
+  @Get("submissions")
+  async getAllSubmissions(
+    @Query("student_id") student_id: number,
+    @Query("question_id") question_id: number
+  ): Promise<SubmissionDto[]> {
+    return await this.adminService.getAllSubmissions(student_id, question_id);
+  }
+
   @Post("submit")
   async submit(
     @Body("student_id") student_id: number,
