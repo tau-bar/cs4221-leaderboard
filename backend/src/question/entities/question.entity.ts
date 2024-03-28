@@ -5,6 +5,12 @@ export class Question {
     @PrimaryGeneratedColumn({ type: "int8" })
     id: number;
 
+    @Column("text", { nullable: false, unique: true })
+    question_name: string;
+
+    @Column("text", { nullable: false, default: "public" })
+    schema_name: string;
+
     @Column("text", { nullable: false })
     description: string;
 

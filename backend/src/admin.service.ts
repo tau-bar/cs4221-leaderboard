@@ -10,7 +10,6 @@ import { CreateSubmissionDto } from './submission/dto/create-submission.dto';
 import { SubmissionDto } from './submission/dto/submission.dto';
 import { QueueWorkerCallback } from 'queue';
 import { SUBMISSION_STATUS } from './submission/constants/submission.constant';
-import { Submission } from './submission/entities/submission.entity';
 
 @Injectable()
 export class AdminService {
@@ -21,14 +20,17 @@ export class AdminService {
     private readonly questionService: QuestionService,
     private readonly studentService: StudentService,
     private readonly submissionService: SubmissionService
-  ) {}
+  ) { }
 
-  async setupQuestion(question_id: number): Promise<void> {
-    const question = await this.questionService.findByKey(question_id);
+  async setupQuestion(schema_name: string, question_schema: string, question_data: string): Promise<void> {
     const queryRunner = this.adminDataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.query(question.question_schema);
-    await queryRunner.query(question.question_data);
+    await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
+    await queryRunner.query(`alter default privileges for role ${process.env.ADMIN_USERNAME} in schema ${schema_name} grant select on tables to ${process.env.PARTICIPANT_USERNAME};`);
+    await queryRunner.query(`SET LOCAL SEARCH_PATH=${schema_name}`);
+    await queryRunner.query(question_schema);
+    await queryRunner.query(question_data);
+    await queryRunner.query(`SET LOCAL SEARCH_PATH=public`);
     await queryRunner.release();
   }
 
@@ -93,7 +95,7 @@ export class AdminService {
           break;
         }
       }
-      
+
       if (is_correct) {
         submission.is_correct = true;
       }

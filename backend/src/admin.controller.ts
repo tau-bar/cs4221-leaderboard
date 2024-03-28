@@ -8,13 +8,6 @@ import { SubmissionDto } from './submission/dto/submission.dto';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post("setup")
-  async setupQuestion(
-    @Body("question_id") question_id: number,
-  ): Promise<void> {
-    this.adminService.setupQuestion(question_id);
-  }
-
   @Get("submission")
   async getSubmission(
     @Query("student_id") student_id: number,
@@ -51,5 +44,14 @@ export class AdminController {
       query: submission.query,
       status: submission.status
     }
+  }
+
+  @Post('setup')
+  async setup(
+    @Body("name") name: string,
+    @Body("question_schema") question_schema: string,
+    @Body("question_data") question_data: string
+  ): Promise<void> {
+    this.adminService.setupQuestion(name, question_schema, question_data);
   }
 }
