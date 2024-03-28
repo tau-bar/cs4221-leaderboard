@@ -4,6 +4,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 export class AddMondial1711598987931 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS mondial`);
+        await queryRunner.query(`GRANT USAGE ON SCHEMA mondial TO ${process.env.PARTICIPANT_USERNAME};`)
         await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA mondial GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
         const modifiedTables = mondialSchema.replace(/CREATE TABLE (\w+)/g, (match, tableName) => `CREATE TABLE IF NOT EXISTS "mondial"."${tableName.toLowerCase()}"`).replace(/REFERENCES (\w+)/g, (match, tableName) => `REFERENCES "mondial"."${tableName.toLowerCase()}"`);
         await queryRunner.query(modifiedTables); // Execute each query separately

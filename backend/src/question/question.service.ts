@@ -24,6 +24,7 @@ export class QuestionService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
       await queryRunner.query(`CREATE SCHEMA ${name}`);
+      await queryRunner.query(`GRANT USAGE ON SCHEMA ${name} TO ${process.env.PARTICIPANT_USERNAME};`)
       await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
       await queryRunner.query(`SET LOCAL SEARCH_PATH = ${name}`);
       await queryRunner.query(question_schema);
