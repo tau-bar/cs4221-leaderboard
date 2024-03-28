@@ -81,11 +81,12 @@ export class AdminService {
         submission.execution_time = parseFloat(analysis[analysis.length - 1]["QUERY PLAN"].substring(16, 21));
       }
 
-      let is_correct = false;
+      let is_correct = true;
       // verify correctness of query
       for (let i = 0; i < result.length; i++) {
         const actual_row = result[i];
         const expected_row = question.answer_data[i];
+        console.log(actual_row, expected_row);
         const keys = Object.keys(expected_row);
         let is_row_correct = true;
         for (let key of keys) {
@@ -101,9 +102,7 @@ export class AdminService {
         }
       }
 
-      if (is_correct) {
-        submission.is_correct = true;
-      }
+      submission.is_correct = is_correct;
 
       cb(null, { submission });
     }
