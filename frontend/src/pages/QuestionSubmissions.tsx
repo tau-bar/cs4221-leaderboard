@@ -50,6 +50,13 @@ function QueryDisplay({ query }: { query: string }) {
   );
 }
 
+const statusColours: Record<QuestionStatus, string> = {
+  PENDING: 'yellow',
+  COMPLETED: 'green',
+  TIMEOUT: 'red',
+  FAILED: 'red',
+};
+
 export default function QuestionSubmissions() {
   const { profile } = useUserStore();
   const { id } = useParams();
@@ -57,7 +64,7 @@ export default function QuestionSubmissions() {
 
   useEffect(() => {
     if (!id || !profile) return;
-    getSubmissions(Number.parseInt(id), Number.parseInt(profile.id)).then(
+    getSubmissions(Number.parseInt(profile.id), Number.parseInt(id)).then(
       (submissions) => {
         setSubmissions(submissions);
       },
@@ -74,9 +81,7 @@ export default function QuestionSubmissions() {
       </Table.Td>
       <Table.Td>
         <Badge
-          color={
-            submission.status === QuestionStatus.PENDING ? 'yellow' : 'green'
-          }
+          color={statusColours[submission.status as QuestionStatus] || 'grey'}
           variant="light"
           style={{
             fontWeight: 'bold',

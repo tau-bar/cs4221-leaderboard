@@ -1,3 +1,5 @@
+import { QuestionStatus } from '../api/question';
+
 export type QuestionDto = {
   id: number;
   question_name: string;
@@ -17,5 +19,5 @@ export type SubmissionDto = {
   planning_time: number;
   execution_time: number;
   query: string;
-  status: string;
+  status: QuestionStatus;
 };

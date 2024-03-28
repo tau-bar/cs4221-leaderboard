@@ -23,64 +23,17 @@ export async function submitQuery(
 export enum QuestionStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
+  TIMEOUT = 'TIMEOUT',
+  FAILED = 'FAILED',
 }
 
 export async function getSubmissions(
   student_id: number,
   question_id: number,
 ): Promise<SubmissionDto[]> {
-  return [
-    {
-      student_id: student_id,
-      question_id: question_id,
-      submission_time: new Date('2024-03-23T08:00:00Z'),
-      is_correct: true,
-      planning_time: 5,
-      execution_time: 10,
-      query: 'SELECT * FROM students WHERE age > 20;',
-      status: QuestionStatus.PENDING,
-    },
-    {
-      student_id: student_id,
-      question_id: question_id,
-      submission_time: new Date('2024-03-23T08:05:00Z'),
-      is_correct: false,
-      planning_time: 3,
-      execution_time: 15,
-      query: 'SELECT name, age FROM students WHERE age > 25;',
-      status: QuestionStatus.COMPLETED,
-    },
-    {
-      student_id: student_id,
-      question_id: question_id,
-      submission_time: new Date('2024-03-23T08:10:00Z'),
-      is_correct: true,
-      planning_time: 7,
-      execution_time: 8,
-      query: 'SELECT COUNT(*) FROM orders;',
-      status: QuestionStatus.COMPLETED,
-    },
-    {
-      student_id: student_id,
-      question_id: question_id,
-      submission_time: new Date('2024-03-23T08:15:00Z'),
-      is_correct: true,
-      planning_time: 4,
-      execution_time: 12,
-      query: 'SELECT AVG(amount) FROM orders WHERE status = "completed";',
-      status: QuestionStatus.COMPLETED,
-    },
-    {
-      student_id: student_id,
-      question_id: question_id,
-      submission_time: new Date('2024-03-23T08:20:00Z'),
-      is_correct: false,
-      planning_time: 6,
-      execution_time: 20,
-      query: 'SELECT MAX(quantity) FROM products;',
-      status: QuestionStatus.COMPLETED,
-    },
-  ];
-
-  // TODO: backend integration
+  student_id = 1; // TODO: remove hardcoding
+  const resp = await axios.get<SubmissionDto[]>(
+    `${API_URL}/admin/submissions?student_id=${student_id}&question_id=${question_id}`,
+  );
+  return resp.data;
 }

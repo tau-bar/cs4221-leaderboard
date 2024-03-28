@@ -36,7 +36,7 @@ const HomePage = () => {
       <Table.Td>{qn.id}</Table.Td>
       <Table.Td>
         <Anchor href={`${ROUTES.QUESTION.replace(':id', qn.id.toString())}`}>
-          {qn.name}
+          {qn.question_name}
         </Anchor>
       </Table.Td>
       <Table.Td>{qn.description}</Table.Td>
