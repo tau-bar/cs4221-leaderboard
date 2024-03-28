@@ -6,6 +6,9 @@ export class Question {
     id: number;
 
     @Column("text", { nullable: false })
+    name: string;
+
+    @Column("text", { nullable: false })
     description: string;
 
     @Column("text", { nullable: false })

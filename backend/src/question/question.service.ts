@@ -10,6 +10,7 @@ import { AdminService } from 'src/admin.service';
 export class QuestionService {
   constructor(
     @InjectDataSource('admin') private readonly dataSource: DataSource,
+    @InjectDataSource('participant') private readonly participantDataSource: DataSource,
     @InjectRepository(Question, 'admin')
     private readonly questionRepository: Repository<Question>,
   ) { }

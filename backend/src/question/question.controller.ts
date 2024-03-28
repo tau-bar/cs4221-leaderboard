@@ -5,7 +5,6 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 @Controller('question')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) { }
-
   @Get('list')
   async getQuestions(
     @Query('page') page: number = 1,
