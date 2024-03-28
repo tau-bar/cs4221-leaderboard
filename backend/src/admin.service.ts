@@ -74,25 +74,29 @@ export class AdminService {
         submission.execution_time = parseFloat(analysis[2]["QUERY PLAN"].substring(16, 21));
       }
 
+      let is_correct = false;
       // verify correctness of query
       for (let i = 0; i < result.length; i++) {
         const actual_row = result[i];
         const expected_row = question.answer_data[i];
-        const keys = Object.keys(actual_row);
+        const keys = Object.keys(expected_row);
         let is_row_correct = true;
         for (let key of keys) {
-          // if key in actual row is not in expected row or the value is different
-          if (!expected_row.hasOwnProperty(key) || actual_row[key] !== expected_row[key]) {
+          // if key in expected row is not in actual row or the value is different
+          if (!actual_row.hasOwnProperty(key) || actual_row[key] !== expected_row[key]) {
             is_row_correct = false;
             break;
           }
         }
         if (!is_row_correct) {
-          submission.is_correct = false;
+          is_correct = false;
           break;
         }
       }
-      submission.is_correct = true;
+      
+      if (is_correct) {
+        submission.is_correct = true;
+      }
 
       cb(null, { submission });
     }
