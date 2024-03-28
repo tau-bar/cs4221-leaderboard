@@ -16,17 +16,17 @@ export class QuestionService {
   ) { }
 
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
-    const { name, question_schema, question_data } = createQuestionDto;
+    const { schema_name, question_schema, question_data } = createQuestionDto;
     const queryRunner = this.dataSource.createQueryRunner();
 
     let question;
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      await queryRunner.query(`CREATE SCHEMA ${name}`);
-      await queryRunner.query(`GRANT USAGE ON SCHEMA ${name} TO ${process.env.PARTICIPANT_USERNAME};`)
-      await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
-      await queryRunner.query(`SET LOCAL SEARCH_PATH = ${name}`);
+      await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
+      await queryRunner.query(`GRANT USAGE ON SCHEMA ${schema_name} TO ${process.env.PARTICIPANT_USERNAME};`)
+      await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${schema_name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
+      await queryRunner.query(`SET LOCAL SEARCH_PATH = ${schema_name}`);
       await queryRunner.query(question_schema);
       await queryRunner.query(question_data);
       await queryRunner.query('SET LOCAL SEARCH_PATH = public');

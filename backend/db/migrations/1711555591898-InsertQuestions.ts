@@ -7,11 +7,12 @@ export class InsertQuestions1711555591898 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         for (const question of await loadQuestions()) {
             await queryRunner.query(`
-                INSERT INTO "admin"."question" (id, name, description, question_schema, question_data, answer_data, max_timeout)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                INSERT INTO "admin"."question" (id, question_name, schema_name, description, question_schema, question_data, answer_data, max_timeout)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             `, [
                 question.id,
-                question.name,
+                question.question_name,
+                question.schema_name,
                 question.description,
                 question.question_schema,
                 question.question_data,

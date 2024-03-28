@@ -5,8 +5,11 @@ export class Question {
     @PrimaryGeneratedColumn({ type: "int8" })
     id: number;
 
+    @Column("text", { nullable: false, unique: true })
+    question_name: string;
+
     @Column("text", { nullable: false })
-    name: string;
+    schema_name: string;
 
     @Column("text", { nullable: false })
     description: string;
