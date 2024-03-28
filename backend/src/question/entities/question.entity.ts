@@ -5,6 +5,12 @@ export class Question {
     @PrimaryGeneratedColumn({ type: "int8" })
     id: number;
 
+    @Column("text", { nullable: false, unique: true })
+    question_name: string;
+
+    @Column("text", { nullable: false })
+    schema_name: string;
+
     @Column("text", { nullable: false })
     description: string;
 
@@ -14,8 +20,8 @@ export class Question {
     @Column("text", { nullable: false })
     question_data: string;
 
-    @Column("text", { nullable: false })
-    answer_data: string;
+    @Column("jsonb", { nullable: false })
+    answer_data: any[];
 
     @Column("int8", { nullable: false })
     max_timeout: number;

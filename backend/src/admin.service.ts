@@ -13,13 +13,17 @@ export class AdminService {
     private readonly questionService: QuestionService,
     private readonly studentService: StudentService,
     private readonly submissionService: SubmissionService
-  ) {}
+  ) { }
 
-  async setupQuestion(question_schema: string, question_data: string): Promise<void> {
+  async setupQuestion(name: string, question_schema: string, question_data: string): Promise<void> {
     const queryRunner = this.adminDataSource.createQueryRunner();
     await queryRunner.connect();
+    await queryRunner.query(`CREATE SCHEMA ${name}`);
+    await queryRunner.query(`alter default privileges for role ${process.env.ADMIN_USERNAME} in schema ${name} grant select on tables to ${process.env.PARTICIPANT_USERNAME};`);
+    await queryRunner.query(`SET LOCAL SEARCH_PATH=${name}`);
     await queryRunner.query(question_schema);
     await queryRunner.query(question_data);
+    await queryRunner.query(`SET LOCAL SEARCH_PATH=public`);
     await queryRunner.release();
   }
 }
