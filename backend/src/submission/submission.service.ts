@@ -63,45 +63,57 @@ export class SubmissionService {
     const skip = (page - 1) * size;
 
     // Query to get the earliest and fastest correct submission per student
-    const rawSubmissions = await this.submissionRepository
-      .createQueryBuilder('submission')
-      .select('submission.student_id', 'studentId')
-      .addSelect('MIN(submission.submission_time)', 'submittedDate')
-      .addSelect('MIN(submission.execution_time)', 'executionTime')
-      .addSelect('MIN(submission.planning_time)', 'planningTime')
-      .addSelect(
-        'MIN(submission.execution_time + submission.planning_time)',
-        'totalTime',
-      ) // Calculate total time
-      .where('submission.question_id = :question_id', { question_id })
-      .andWhere('submission.is_correct = true')
-      .groupBy('submission.student_id')
-      .orderBy(
-        'MIN(submission.execution_time + submission.planning_time)',
-        'ASC',
-      ) // Directly calculate and order by total time
-      .addOrderBy('MIN(submission.execution_time)', 'ASC') // Then by execution time
-      .addOrderBy('MIN(submission.planning_time)', 'ASC') // Then by planning time
-      .addOrderBy('MIN(submission.submission_time)', 'ASC') // Finally by submitted date
-      .limit(size)
-      .offset(skip)
-      .getRawMany();
+    const rawQuery = `
+    WITH RankedSubmissions AS (
+      SELECT
+        student_id,
+        submission_time,
+        execution_time,
+        planning_time,
+        (execution_time + planning_time) AS total_time,
+        RANK() OVER (
+          PARTITION BY student_id
+          ORDER BY (execution_time + planning_time), submission_time
+        ) AS rank
+      FROM admin.submission
+      WHERE
+        question_id = $1 AND
+        is_correct = true
+    )
+    SELECT
+      student_id,
+      submission_time,
+      execution_time,
+      planning_time,
+      total_time
+    FROM RankedSubmissions
+    WHERE rank = 1
+    OFFSET $2 LIMIT $3;
+  `;
+
+    const results = await this.submissionRepository.query(rawQuery, [
+      question_id,
+      skip,
+      size,
+    ]);
+
+    console.log(results);
 
     // Find total number of unique students with correct submissions
-    const totalStudents = rawSubmissions.length;
+    const totalStudents = results.length;
 
     // // Paginate the rawSubmissions based on the page and size
     // const paginatedSubmissions = rawSubmissions.slice(skip, skip + size);
 
     // Transform submissions into LeaderboardEntries
-    const leaderboardEntries: LeaderboardEntry[] = rawSubmissions.map(
+    const leaderboardEntries: LeaderboardEntry[] = results.map(
       (submission, index) => ({
         rank: skip + index + 1,
-        studentName: submission.studentId, // Placeholder for student name
-        submittedDate: submission.submittedDate.toISOString(),
-        executionTime: Number(submission.executionTime),
-        planningTime: Number(submission.planningTime),
-        totalTime: Number(submission.totalTime),
+        studentName: submission.student_id, // Placeholder for student name
+        submittedDate: submission.submission_time,
+        executionTime: Number(submission.execution_time),
+        planningTime: Number(submission.planning_time),
+        totalTime: Number(submission.total_time),
         isCurrentUser: submission.studentId === student_id,
       }),
     );
