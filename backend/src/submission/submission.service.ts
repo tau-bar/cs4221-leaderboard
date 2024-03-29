@@ -66,26 +66,29 @@ export class SubmissionService {
     const rawQuery = `
     WITH RankedSubmissions AS (
       SELECT
-        student_id,
-        submission_time,
-        execution_time,
-        planning_time,
-        (execution_time + planning_time) AS total_time,
+        s.student_id,
+        s.submission_time,
+        s.execution_time,
+        s.planning_time,
+        (s.execution_time + s.planning_time) AS total_time,
+        st.name AS student_name,
         RANK() OVER (
-          PARTITION BY student_id
-          ORDER BY (execution_time + planning_time), submission_time
+          PARTITION BY s.student_id
+          ORDER BY (s.execution_time + s.planning_time), s.submission_time
         ) AS rank
-      FROM admin.submission
+      FROM admin.submission s
+      JOIN admin.student st ON s.student_id = st.id
       WHERE
-        question_id = $1 AND
-        is_correct = true
+        s.question_id = $1 AND
+        s.is_correct = true
     )
     SELECT
       student_id,
       submission_time,
       execution_time,
       planning_time,
-      total_time
+      total_time,
+      student_name
     FROM RankedSubmissions
     WHERE rank = 1
     OFFSET $2 LIMIT $3;
@@ -102,14 +105,11 @@ export class SubmissionService {
     // Find total number of unique students with correct submissions
     const totalStudents = results.length;
 
-    // // Paginate the rawSubmissions based on the page and size
-    // const paginatedSubmissions = rawSubmissions.slice(skip, skip + size);
-
     // Transform submissions into LeaderboardEntries
     const leaderboardEntries: LeaderboardEntry[] = results.map(
       (submission, index) => ({
         rank: skip + index + 1,
-        studentName: submission.student_id, // Placeholder for student name
+        studentName: submission.student_name,
         submittedDate: submission.submission_time,
         executionTime: Number(submission.execution_time),
         planningTime: Number(submission.planning_time),
@@ -124,31 +124,7 @@ export class SubmissionService {
 
     // If the current student's submission is not in the paginated results, fetch it separately
     if (!curr_student) {
-      const currentUserSubmission = await this.submissionRepository.findOne({
-        where: {
-          student_id: student_id,
-          question_id: question_id,
-          is_correct: true,
-        },
-        order: {
-          execution_time: 'ASC',
-          planning_time: 'ASC',
-          submission_time: 'ASC',
-        }, // Tiebreaker order
-      });
-      if (currentUserSubmission) {
-        curr_student = {
-          rank: 0, // The actual rank needs to be calculated if necessary
-          studentName: currentUserSubmission.student_id, // Placeholder for student name
-          submittedDate: currentUserSubmission.submission_time.toISOString(),
-          executionTime: Number(currentUserSubmission.execution_time),
-          planningTime: Number(currentUserSubmission.planning_time),
-          totalTime:
-            Number(currentUserSubmission.execution_time) +
-            Number(currentUserSubmission.planning_time),
-          isCurrentUser: true,
-        };
-      }
+      curr_student = await this.getCurrentStudentRank(question_id, student_id);
     }
 
     // Return the DTO with the current student's submission, question ID, and total number of students
@@ -158,6 +134,60 @@ export class SubmissionService {
       question_id: question_id,
       total: totalStudents,
     };
+  }
+
+  async getCurrentStudentRank(
+    question_id: number,
+    student_id: string,
+  ): Promise<LeaderboardEntry | null> {
+    const rawQuery = `
+      WITH CorrectSubmissions AS (
+        SELECT
+          s.student_id,
+          s.submission_time,
+          s.execution_time,
+          s.planning_time,
+          (s.execution_time + s.planning_time) AS total_time,
+          st.name AS student_name,
+          RANK() OVER (
+            ORDER BY (s.execution_time + s.planning_time), s.submission_time
+          ) AS rank
+        FROM admin.submission s
+        JOIN admin.student st ON s.student_id = st.id
+        WHERE
+          s.question_id = $1 AND
+          s.is_correct = true
+      )
+      SELECT
+        rank,
+        student_id,
+        student_name,
+        submission_time,
+        execution_time,
+        planning_time,
+        total_time
+      FROM CorrectSubmissions
+      WHERE student_id = $2;
+    `;
+
+    const result = await this.submissionRepository.query(rawQuery, [
+      question_id,
+      student_id,
+    ]);
+    if (result && result.length > 0) {
+      const submission = result[0];
+      return {
+        rank: submission.rank,
+        studentName: submission.student_name,
+        submittedDate: submission.submission_time,
+        executionTime: Number(submission.execution_time),
+        planningTime: Number(submission.planning_time),
+        totalTime: Number(submission.total_time),
+        isCurrentUser: true,
+      };
+    }
+
+    return null;
   }
 
   async findByKey(key: SubmissionKeyDto): Promise<Submission> {
