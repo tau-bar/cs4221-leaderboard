@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Param } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 
@@ -19,7 +19,7 @@ export class QuestionController {
   }
 
   @Get(':id')
-  async getQuestion(@Query('id') id: number) {
+  async getQuestion(@Param('id') id: number) {
     return await this.questionService.findByKey(id);
   }
 
