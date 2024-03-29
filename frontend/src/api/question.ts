@@ -32,7 +32,7 @@ export enum QuestionStatus {
 }
 
 export async function getSubmissions(
-  student_id: number,
+  student_id: string,
   question_id: number,
 ): Promise<SubmissionDto[]> {
   const resp = await axios.get<SubmissionDto[]>(

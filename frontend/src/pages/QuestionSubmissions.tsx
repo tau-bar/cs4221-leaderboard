@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   Badge,
   Button,
@@ -18,6 +18,7 @@ import { DateTime } from 'luxon';
 import { useUserStore } from '../store/userStore';
 import type { SubmissionDto } from '../types/question';
 import { QuestionStatus, getSubmissions } from '../api/question';
+import { ROUTES } from '../constants/routes';
 
 function QueryDisplay({ query }: { query: string }) {
   const [opened, { close, open }] = useDisclosure(false);
@@ -64,12 +65,21 @@ export default function QuestionSubmissions() {
 
   useEffect(() => {
     if (!id || !profile) return;
-    getSubmissions(Number.parseInt(profile.id), Number.parseInt(id)).then(
-      (submissions) => {
-        setSubmissions(submissions);
-      },
-    );
+    getSubmissions(profile.id, Number.parseInt(id)).then((submissions) => {
+      setSubmissions(submissions);
+    });
   }, [id, profile]);
+
+  if (!id) {
+    return (
+      <div>
+        <Text>Question not found</Text>
+        <Text>
+          Back to <Link to={ROUTES.HOME}>Questions list</Link>
+        </Text>
+      </div>
+    );
+  }
 
   const rows = submissions.map((submission) => (
     <Table.Tr key={submission.submission_time.toString()}>
@@ -81,7 +91,7 @@ export default function QuestionSubmissions() {
       </Table.Td>
       <Table.Td>
         <Badge
-          color={statusColours[submission.status as QuestionStatus] || 'grey'}
+          color={statusColours[submission.status] || 'grey'}
           variant="light"
           style={{
             fontWeight: 'bold',
@@ -110,29 +120,40 @@ export default function QuestionSubmissions() {
     </Table.Tr>
   ));
 
+  const table = (
+    <Table
+      withTableBorder
+      striped
+      highlightOnHover
+      stickyHeader
+      my={10}
+      w={'70%'}
+    >
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>Query</Table.Th>
+          <Table.Th>Submitted</Table.Th>
+          <Table.Th>Status</Table.Th>
+          <Table.Th>Correctness</Table.Th>
+          <Table.Th>Planning Time</Table.Th>
+          <Table.Th>Execution Time</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>{rows}</Table.Tbody>
+    </Table>
+  );
+
   return (
     <Stack align="center" flex={1}>
       <Title order={2}>Question Submissions</Title>
-      <Table
-        withTableBorder
-        striped
-        highlightOnHover
-        stickyHeader
-        my={10}
-        w={'70%'}
-      >
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Query</Table.Th>
-            <Table.Th>Submitted</Table.Th>
-            <Table.Th>Status</Table.Th>
-            <Table.Th>Correctness</Table.Th>
-            <Table.Th>Planning Time</Table.Th>
-            <Table.Th>Execution Time</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
-      </Table>
+      {rows.length > 0 ? (
+        table
+      ) : (
+        <Text>
+          No submissions found.{' '}
+          <Link to={ROUTES.QUESTION.replace(':id', id)}>Attempt question</Link>
+        </Text>
+      )}
     </Stack>
   );
 }
