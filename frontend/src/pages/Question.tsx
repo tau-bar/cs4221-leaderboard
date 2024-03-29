@@ -62,26 +62,24 @@ export default function Question() {
       return;
     }
 
-    submitQuery(Number.parseInt(profile.id), Number.parseInt(id), query).then(
-      (success) => {
-        if (success) {
-          notifications.show({
-            title: 'Query submitted successfully',
-            message: 'Redirecting...',
-            color: 'green',
-          });
-          setTimeout(
-            () => navigate(ROUTES.QUESTION_SUBMISSIONS.replace(':id', id)),
-            1000,
-          );
-        } else {
-          notifications.show({
-            message: 'Failed to submit query',
-            color: 'red',
-          });
-        }
-      },
-    );
+    submitQuery(profile, Number.parseInt(id), query).then((success) => {
+      if (success) {
+        notifications.show({
+          title: 'Query submitted successfully',
+          message: 'Redirecting...',
+          color: 'green',
+        });
+        setTimeout(
+          () => navigate(ROUTES.QUESTION_SUBMISSIONS.replace(':id', id)),
+          1000,
+        );
+      } else {
+        notifications.show({
+          message: 'Failed to submit query',
+          color: 'red',
+        });
+      }
+    });
   };
 
   if (loading) {
