@@ -8,7 +8,7 @@ export class Question {
     @Column("text", { nullable: false, unique: true })
     question_name: string;
 
-    @Column("text", { nullable: false })
+    @Column("text", { nullable: false, default: "public" })
     schema_name: string;
 
     @Column("text", { nullable: false })
@@ -20,8 +20,8 @@ export class Question {
     @Column("text", { nullable: false })
     question_data: string;
 
-    @Column("jsonb", { nullable: false })
-    answer_data: any[];
+    @Column("jsonb", { nullable: false, array: true })
+    answer_data: object[];
 
     @Column("int8", { nullable: false })
     max_timeout: number;

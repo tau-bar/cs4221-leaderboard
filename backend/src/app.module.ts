@@ -8,13 +8,16 @@ import { ParticipantService } from './participant.service';
 import { ParticipantController } from './participant.controller';
 import 'dotenv/config';
 import { DatabaseModule } from './database.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
     DatabaseModule,
+    QueueModule,
     QuestionModule,
     StudentModule,
-    SubmissionModule
+    SubmissionModule,
+    QueueModule
   ],
   controllers: [AdminController, ParticipantController],
   providers: [AdminService, ParticipantService]

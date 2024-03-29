@@ -20,12 +20,24 @@ export class SubmissionService {
     return await this.submissionRepository.find();
   }
 
-  async findByKey(student_id: number, question_id: number, submission_time: Date): Promise<Submission> {
-    return await this.submissionRepository.findOne({
+  async findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id: number, question_id: number): Promise<Submission[]> {
+    return await this.submissionRepository.find({
       where: {
         student_id: student_id,
-        question_id: question_id,
-        submission_time: submission_time
+        question_id: question_id
+      },
+      order: {
+        submission_time: "DESC"
+      }
+    });
+  }
+
+  async findByKey(key: SubmissionKeyDto): Promise<Submission> {
+    return await this.submissionRepository.findOne({
+      where: {
+        student_id: key.student_id,
+        question_id: key.question_id,
+        submission_time: key.submission_time
       }
     });
   }
