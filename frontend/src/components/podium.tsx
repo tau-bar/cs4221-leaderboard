@@ -1,5 +1,5 @@
 import { Card, Text, Group, Stack, Title } from '@mantine/core';
-import { LeaderboardEntry } from '../pages/Leaderboard';
+import { LeaderboardEntry } from '../api/leaderboard';
 
 interface PodiumProps {
   data: LeaderboardEntry[];

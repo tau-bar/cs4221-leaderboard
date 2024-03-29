@@ -12,130 +12,41 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import Podium from '../components/podium';
-
-export interface LeaderboardEntry {
-  rank: number;
-  studentName: string;
-  submittedDate: string;
-  executionTime: number; // in seconds
-  planningTime: number; // in seconds
-  totalTime: number; // in seconds
-  isCurrentUser?: boolean; // To identify the current user's submission
-}
-
-// Mock data generator
-const generateMockData = (): LeaderboardEntry[] => {
-  const mockData: LeaderboardEntry[] = [
-    // Include some fixed entries, possibly from a backend in a real app
-    {
-      rank: 1,
-      studentName: 'Alice',
-      submittedDate: '2024-03-20',
-      executionTime: 120,
-      planningTime: 300,
-      totalTime: 420,
-    },
-    {
-      rank: 2,
-      studentName: 'Bob',
-      submittedDate: '2024-03-19',
-      executionTime: 150,
-      planningTime: 350,
-      totalTime: 500,
-    },
-    {
-      rank: 3,
-      studentName: 'Charlie',
-      submittedDate: '2024-03-18',
-      executionTime: 200,
-      planningTime: 300,
-      totalTime: 500,
-      isCurrentUser: true,
-    },
-    {
-      rank: 4,
-      studentName: 'Bob',
-      submittedDate: '2024-03-19',
-      executionTime: 150,
-      planningTime: 350,
-      totalTime: 500,
-    },
-    {
-      rank: 5,
-      studentName: 'Charlie',
-      submittedDate: '2024-03-18',
-      executionTime: 200,
-      planningTime: 300,
-      totalTime: 500,
-    },
-    {
-      rank: 6,
-      studentName: 'Bob',
-      submittedDate: '2024-03-19',
-      executionTime: 150,
-      planningTime: 350,
-      totalTime: 500,
-    },
-    {
-      rank: 7,
-      studentName: 'Charlie',
-      submittedDate: '2024-03-18',
-      executionTime: 200,
-      planningTime: 300,
-      totalTime: 500,
-    },
-    {
-      rank: 8,
-      studentName: 'Bob',
-      submittedDate: '2024-03-19',
-      executionTime: 150,
-      planningTime: 350,
-      totalTime: 500,
-    },
-    {
-      rank: 9,
-      studentName: 'Charlie',
-      submittedDate: '2024-03-18',
-      executionTime: 200,
-      planningTime: 300,
-      totalTime: 500,
-    },
-    {
-      rank: 10,
-      studentName: 'Bob',
-      submittedDate: '2024-03-19',
-      executionTime: 150,
-      planningTime: 350,
-      totalTime: 500,
-    },
-    // More entries can be added here
-  ];
-
-  // Sort by rank for demonstration
-  mockData.sort((a, b) => a.rank - b.rank);
-
-  return mockData;
-};
+import { LeaderboardEntry, getLeaderboard } from '../api/leaderboard';
+import { useUserStore } from '../store/userStore';
 
 const ITEMS_PER_PAGE = 10;
 
 const Leaderboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState<LeaderboardEntry[]>([]);
+  const [current_student, setCurrentStudent] =
+    useState<LeaderboardEntry | null>(null);
+  const [topThree, setTopThree] = useState<LeaderboardEntry[]>([]);
   const { id } = useParams();
   const { colorScheme } = useMantineColorScheme();
+  const { profile } = useUserStore();
 
   useEffect(() => {
-    setData(generateMockData());
-  }, []);
+    if (!id || !profile) return;
+    getLeaderboard(
+      profile.id,
+      Number.parseInt(id),
+      currentPage,
+      ITEMS_PER_PAGE,
+    ).then((leaderboard) => {
+      setData(leaderboard.leaderboardEntries);
+      setCurrentStudent(leaderboard.curr_student);
+      if (currentPage === 1) {
+        // slice the top 3 entries for the podium
+        setTopThree(leaderboard.leaderboardEntries.slice(0, 3));
+      }
+    });
+  }, [id, profile, currentPage]);
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const pagedData = data.slice(startIndex, endIndex);
-
-  const currentUserSubmission: LeaderboardEntry | undefined = data.find(
-    (entry) => entry.isCurrentUser,
-  );
 
   const getHighlightColor = () => {
     if (colorScheme === 'dark') {
@@ -147,28 +58,21 @@ const Leaderboard = () => {
   return (
     <Container>
       <Title>Leaderboard for question {id}</Title>
-      {currentUserSubmission ? (
+      {current_student ? (
         <Card mt={5}>
           <Text>Your submission:</Text>
           <Text>
-            Rank <b>{currentUserSubmission?.rank}</b>, Total Time:{' '}
-            {currentUserSubmission?.totalTime} sec
+            Rank <b>{current_student?.rank}</b>, Total Time:{' '}
+            {current_student?.totalTime} sec
           </Text>
         </Card>
       ) : (
-        <Alert
-          color="blue"
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            width: 'calc(100% - 20px)',
-          }}
-        >
-          You have not submitted yet!
+        <Alert color="blue" mt={2}>
+          You have not submitted a correct query yet!
         </Alert>
       )}
       <Stack align="center">
-        <Podium data={data} />
+        <Podium data={topThree} />
 
         <Table striped highlightOnHover stickyHeader my={10}>
           <Table.Thead>
