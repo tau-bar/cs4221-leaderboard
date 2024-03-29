@@ -33,6 +33,18 @@ const AddQuestion = () => {
           message: 'Question has been created successfully',
           color: 'green',
         });
+
+        setFormData({
+          question_name: '',
+          schema_name: '',
+          description: '',
+          question_schema: '',
+          question_data: '',
+          sample_answer: '',
+          answer_data: '',
+          max_timeout: 0,
+        });
+        
       } else {
         notifications.show({
           title: 'Error',
