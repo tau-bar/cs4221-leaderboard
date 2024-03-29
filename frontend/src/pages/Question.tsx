@@ -17,10 +17,12 @@ import { getQuestion, submitQuery } from '../api/question';
 import type { QuestionDto } from '../types/question';
 import { IconDownload, IconTrophy } from '@tabler/icons-react';
 import { AnswerTable } from './AnswerTable';
+import { useUserStore } from '../store/userStore';
 
 export default function Question() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { profile } = useUserStore();
   const [loading, setLoading] = useState(true);
   const [question, setQuestion] = useState<QuestionDto | null>(null);
   const [answer, setAnswer] = useState<Record<string, string>[]>([]);
@@ -52,24 +54,34 @@ export default function Question() {
       return;
     }
 
-    submitQuery(Number.parseInt(id), query).then((success) => {
-      if (success) {
-        notifications.show({
-          title: 'Query submitted successfully',
-          message: 'Redirecting...',
-          color: 'green',
-        });
-        setTimeout(
-          () => navigate(ROUTES.QUESTION_SUBMISSIONS.replace(':id', id)),
-          1000,
-        );
-      } else {
-        notifications.show({
-          message: 'Failed to submit query',
-          color: 'red',
-        });
-      }
-    });
+    if (!profile) {
+      notifications.show({
+        message: 'Please login to submit a query',
+        color: 'red',
+      });
+      return;
+    }
+
+    submitQuery(Number.parseInt(profile.id), Number.parseInt(id), query).then(
+      (success) => {
+        if (success) {
+          notifications.show({
+            title: 'Query submitted successfully',
+            message: 'Redirecting...',
+            color: 'green',
+          });
+          setTimeout(
+            () => navigate(ROUTES.QUESTION_SUBMISSIONS.replace(':id', id)),
+            1000,
+          );
+        } else {
+          notifications.show({
+            message: 'Failed to submit query',
+            color: 'red',
+          });
+        }
+      },
+    );
   };
 
   if (loading) {

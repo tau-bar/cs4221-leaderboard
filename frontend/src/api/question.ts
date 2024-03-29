@@ -9,6 +9,7 @@ export async function getQuestion(id: number): Promise<QuestionDto | null> {
 }
 
 export async function submitQuery(
+  student_id: number,
   question_id: number,
   query: string,
 ): Promise<SubmissionDto> {
