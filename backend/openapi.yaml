@@ -18,10 +18,18 @@ paths:
             schema:
               type: object
               properties:
-                question_id:
+                name:
                   type: string
-                  description: id of question to be set up
-                  example: 1
+                  description: schema name to be initialized for the question
+                  example: public
+                question_schema:
+                  type: string
+                  description: schema initialization script for the question
+                  example: CREATE TABLE test (id INT PRIMARY KEY, name VARCHAR(255));
+                question_data:
+                  type: string
+                  description: data population script for the question
+                  example: INSERT INTO test VALUES (1, 'Alice');
       responses:
         '201':
           description: schema initialized and data populated for the question
@@ -60,6 +68,57 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Submission'
+  /admin/correct-submission:
+    post:
+      summary: Gets all correct submissions
+      description: Returns all correct submissions sorted in descending order of submission time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: string
+                  description: id of the student
+                  example: 1
+                question_id:
+                  type: string
+                  description: id of the question
+                  example: 1
+                submission_time:
+                  type: string
+                  description: time of submission
+                  example: 2024-03-27T15:31:57.094Z
+                is_correct:
+                  type: boolean
+                  description: whether the submission is correct
+                  example: true
+                planning_time:
+                  type: string
+                  description: time taken to plan the submission
+                  example: 0.231
+                execution_time:
+                  type: string
+                  description: time taken to execute the submission
+                  example: 0.061
+                query:
+                  type: string
+                  description: query submitted
+                  example: SELECT * FROM test;
+                status:
+                  type: string
+                  enum: [COMPLETED, PENDING, TIMEOUT, FAILED]
+                  description: status of the submission
+                  example: COMPLETED
+      responses:
+        '201':
+          description: submission corrected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
   /admin/submissions:
     get:
       summary: Get all submissions
@@ -104,6 +163,14 @@ paths:
                   type: string
                   description: id of the student
                   example: 1
+                student_name:
+                  type: string
+                  description: name of the student
+                  example: Alice
+                student_email:
+                  type: string
+                  description: email of the student
+                  example: alice@gmail.com
                 question_id:
                   type: string
                   description: id of the question
@@ -114,11 +181,12 @@ paths:
                   example: SELECT * FROM test;
       responses:
         '201':
-          description: submission created and query queued for evaluation
+          description: submission created and query queued for evaluation. planning_time, execution_time and is_correct will be updated later
+            and will be 0.00, 0.00 and false respectively while status is PENDING
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubmitDto'
+                $ref: '#/components/schemas/Submission'
 
 components:
   schemas:
@@ -158,29 +226,5 @@ components:
           enum: [COMPLETED, PENDING, TIMEOUT, FAILED]
           description: status of the submission
           example: COMPLETED
-    SubmitDto:
-      type: object
-      properties:
-        student_id:
-          type: string
-          description: id of the student
-          example: 1
-        question_id:
-          type: string
-          description: id of the question
-          example: 1
-        submission_time:
-          type: string
-          description: time of submission
-          example: 2024-03-27T15:31:57.094Z
-        query:
-          type: string
-          description: query submitted
-          example: SELECT * FROM test;
-        status:
-          type: string
-          enum: [COMPLETED, PENDING, TIMEOUT, FAILED]
-          description: status of the submission
-          example: PENDING
 
       
