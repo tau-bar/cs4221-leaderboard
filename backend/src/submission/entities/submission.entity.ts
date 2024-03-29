@@ -5,8 +5,8 @@ import { SubmissionKeyDto } from "../dto/submission-key.dto";
 
 @Entity({ schema: "admin", name: "submission" })
 export class Submission {
-    @PrimaryColumn({ type: "int8" })
-    student_id: number;
+    @PrimaryColumn({ type: "text" })
+    student_id: string;
 
     @PrimaryColumn({ type: "int8" })
     question_id: number;

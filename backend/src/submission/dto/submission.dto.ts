@@ -1,5 +1,5 @@
 export class SubmissionDto {
-    readonly student_id: number;
+    readonly student_id: string;
     readonly question_id: number;
     readonly submission_time: Date;
     readonly is_correct: boolean;

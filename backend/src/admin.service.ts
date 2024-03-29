@@ -10,6 +10,8 @@ import { CreateSubmissionDto } from './submission/dto/create-submission.dto';
 import { SubmissionDto } from './submission/dto/submission.dto';
 import { QueueWorkerCallback } from 'queue';
 import { SUBMISSION_STATUS } from './submission/constants/submission.constant';
+import { StudentDto } from './student/dto/student.dto';
+import { SubmitDto } from './admin.dto';
 
 @Injectable()
 export class AdminService {
@@ -38,12 +40,19 @@ export class AdminService {
     return this.submissionService.findByKey(key);
   }
 
-  async getAllSubmissions(student_id: number, question_id: number): Promise<SubmissionDto[]> {
-    return this.submissionService.findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id, question_id);
+  async getAllSubmissions(student_id: string, question_id: number): Promise<SubmissionDto[]> {
+    return await this.submissionService.findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id, question_id);
   }
 
-  async queueSubmissionEvaluation(createSubmissionDto: CreateSubmissionDto): Promise<SubmissionDto> {
+  async getAllCorrectSubmissions(student_id: string, question_id: number): Promise<SubmissionDto[]> {
+    return await this.submissionService.findByStudentIdAndQuestionIdAndIsCorrectOrderBySubmissionTimeDesc(student_id, question_id, true);
+  }
+
+  async queueSubmissionEvaluation(studentDto: StudentDto, createSubmissionDto: CreateSubmissionDto): Promise<SubmissionDto> {
+    await this.createStudentIfNotExist(studentDto);
+
     const submission = await this.submissionService.create(createSubmissionDto);
+
     const question = await this.questionService.findByKey(submission.question_id);
     const resetStatRunner = this.adminDataSource.createQueryRunner();
     const queryRunner = this.participantDataSource.createQueryRunner();
@@ -145,5 +154,12 @@ export class AdminService {
     this.queueService.addTask(task)
 
     return submission;
+  }
+
+  private async createStudentIfNotExist(studentDto: StudentDto) {
+    const student = await this.studentService.findByKey(studentDto.id);
+    if (student == null) {
+      await this.studentService.create(studentDto);
+    }
   }
 }
