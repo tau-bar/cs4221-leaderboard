@@ -1,6 +1,6 @@
 import { Table } from '@mantine/core';
 
-export function AnswerTable({ data }: { data: Record<string, string>[] }) {
+export function AnswerTable({ data = [] }: { data: Record<string, string>[] }) {
   const headers = Object.keys(data[0]);
   const rows = data.map((row, index) => (
     <Table.Tr key={index}>

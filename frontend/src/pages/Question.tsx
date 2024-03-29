@@ -33,7 +33,13 @@ export default function Question() {
     if (!id) return;
     getQuestion(Number.parseInt(id)).then((question) => {
       setQuestion(question);
-      setAnswer(question?.answer_data.slice(0, 5) ?? []);
+      if (question?.answer_data) {
+        const answer = question?.answer_data
+          .replaceAll('\\"', '')
+          .replaceAll('\\r', '');
+        setAnswer(JSON.parse(answer).slice(0, 5) ?? []);
+      }
+      console.log(question);
       setLoading(false);
     });
   }, [id]);

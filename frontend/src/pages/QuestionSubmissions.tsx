@@ -82,12 +82,12 @@ export default function QuestionSubmissions() {
   }
 
   const rows = submissions.map((submission) => (
-    <Table.Tr key={submission.submission_time.toString()}>
+    <Table.Tr key={submission.submission_time}>
       <Table.Td>
         <QueryDisplay query={submission.query} />
       </Table.Td>
       <Table.Td>
-        {DateTime.fromJSDate(submission.submission_time).toRelative()}
+        {DateTime.fromISO(submission.submission_time).toRelative()}
       </Table.Td>
       <Table.Td>
         <Badge
