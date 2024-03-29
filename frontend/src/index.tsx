@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import { Notifications } from '@mantine/notifications';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -18,6 +19,7 @@ root.render(
       <MantineProvider>
         <BrowserRouter>
           <App />
+          <Notifications />
         </BrowserRouter>
       </MantineProvider>
     </React.StrictMode>

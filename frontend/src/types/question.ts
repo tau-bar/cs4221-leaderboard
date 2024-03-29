@@ -20,3 +20,9 @@ export type CreateQuestionDto = {
   answer_data: string;
   max_timeout: number;
 }
+
+export type Response = {
+  success: boolean;
+  data: QuestionDto;
+  error: string;
+}

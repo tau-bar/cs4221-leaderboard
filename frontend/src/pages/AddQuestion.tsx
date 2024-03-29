@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Container, Loader, TextInput, Textarea } from '@mantine/core';
 import { CreateQuestionDto } from '../types/question';
 import { createQuestion } from '../api/questions';
-
+import { notifications } from '@mantine/notifications';
 
 
 const AddQuestion = () => {
@@ -26,14 +26,31 @@ const AddQuestion = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await createQuestion(formData);
+      const question = await createQuestion(formData);
+      if (question.success) {
+        notifications.show({
+          title: 'Success',
+          message: 'Question has been created successfully',
+          color: 'green',
+        });
+      } else {
+        notifications.show({
+          title: 'Error',
+          message: question.error,
+          color: 'red',
+        });
+      }
     } catch (error) {
-      console.error('Error creating question:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to create question. Please try again later.',
+        color: 'red',
+      });
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleChange = (key: keyof CreateQuestionDto, value: string | number) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -42,7 +59,7 @@ const AddQuestion = () => {
   };
 
   const handlePasswordSubmit = () => {
-    if (password === process.env.ADD_QUESTION_PAGE_PASSWORD) {
+    if (password === "abc") {
       setAuthenticated(true);
     } else {
       setIncorrectPassword(true);

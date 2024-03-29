@@ -14,13 +14,14 @@ export class QuestionService {
     private readonly questionRepository: Repository<Question>,
   ) { }
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
-    const { schema_name, question_schema, question_data } = createQuestionDto;
+    const { schema_name, question_schema, question_data, answer_data } = createQuestionDto;
     const queryRunner = this.dataSource.createQueryRunner();
 
     let question;
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
+      JSON.parse(answer_data);
       await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
       await queryRunner.query(`GRANT USAGE ON SCHEMA ${schema_name} TO ${process.env.PARTICIPANT_USERNAME};`)
       await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${schema_name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);

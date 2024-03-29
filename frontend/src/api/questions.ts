@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { CreateQuestionDto, QuestionDto } from '../types/question';
+import { CreateQuestionDto, QuestionDto, Response } from '../types/question';
 
-const API_URL = process.env.REACT_APP_API_URL || 'localhost:3000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 export const getQuestions = async (page: number = 1, limit: number = 10) => {
   const resp = await axios.get<QuestionDto[]>(
@@ -16,6 +16,6 @@ export const getQuestionCount = async () => {
 };
 
 export const createQuestion = async (questionData: CreateQuestionDto) => {
-  const resp = await axios.post<QuestionDto>(`${API_URL}/question/create`, questionData);
+  const resp = await axios.post<Response>(`${API_URL}/question/create`, questionData);
   return resp.data;
 };
