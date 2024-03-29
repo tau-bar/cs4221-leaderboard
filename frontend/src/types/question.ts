@@ -7,7 +7,7 @@ export type QuestionDto = {
   description: string;
   question_schema: string;
   question_data: string;
-  answer_data: string;
+  answer_data: Record<string, string>[];
   max_timeout: number;
 };
 

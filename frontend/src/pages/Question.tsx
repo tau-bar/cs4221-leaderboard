@@ -31,8 +31,7 @@ export default function Question() {
     if (!id) return;
     getQuestion(Number.parseInt(id)).then((question) => {
       setQuestion(question);
-      const answerData = JSON.parse(question?.answer_data ?? '[]');
-      setAnswer(answerData.slice(0, 5));
+      setAnswer(question?.answer_data.slice(0, 5) ?? []);
       setLoading(false);
     });
   }, [id]);
