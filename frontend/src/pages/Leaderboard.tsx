@@ -20,6 +20,7 @@ const ITEMS_PER_PAGE = 10;
 const Leaderboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState<LeaderboardEntry[]>([]);
+  const [total, setTotal] = useState(0);
   const [current_student, setCurrentStudent] =
     useState<LeaderboardEntry | null>(null);
   const [topThree, setTopThree] = useState<LeaderboardEntry[]>([]);
@@ -37,6 +38,7 @@ const Leaderboard = () => {
     ).then((leaderboard) => {
       setData(leaderboard.leaderboardEntries);
       setCurrentStudent(leaderboard.curr_student);
+      setTotal(leaderboard.total);
       if (currentPage === 1) {
         // slice the top 3 entries for the podium
         setTopThree(leaderboard.leaderboardEntries.slice(0, 3));
@@ -109,7 +111,7 @@ const Leaderboard = () => {
           </Table.Tbody>
         </Table>
         <Pagination
-          total={Math.ceil(data.length / ITEMS_PER_PAGE)}
+          total={Math.ceil(total / ITEMS_PER_PAGE)}
           value={currentPage}
           onChange={setCurrentPage}
         />
