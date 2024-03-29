@@ -20,8 +20,11 @@ export class Question {
     @Column("text", { nullable: false })
     question_data: string;
 
-    @Column("jsonb", { nullable: false, array: true })
-    answer_data: object[];
+    @Column("text", { nullable: false, array: true })
+    answer_data: string;
+
+    @Column("text", { nullable: false })
+    sample_answer: string;
 
     @Column("int8", { nullable: false })
     max_timeout: number;
