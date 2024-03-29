@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from './entities/student.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { StudentDto } from './dto/student.dto';
 
 @Injectable()
 export class StudentService {
@@ -11,15 +11,15 @@ export class StudentService {
     @InjectRepository(Student, "admin") private readonly studentRepository: Repository<Student>
   ) {}
 
-  async create(createStudentDto: CreateStudentDto): Promise<Student> {
-    return await this.studentRepository.save(createStudentDto);
+  async create(studentDto: StudentDto): Promise<Student> {
+    return await this.studentRepository.save(studentDto);
   }
 
   async findAll(): Promise<Student[]>{
     return await this.studentRepository.find();
   }
 
-  async findByKey(id: number): Promise<Student> {
+  async findByKey(id: string): Promise<Student> {
     return await this.studentRepository.findOne({
       where: {
         id: id

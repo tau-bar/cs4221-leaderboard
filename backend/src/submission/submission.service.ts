@@ -20,7 +20,22 @@ export class SubmissionService {
     return await this.submissionRepository.find();
   }
 
-  async findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id: number, question_id: number): Promise<Submission[]> {
+  async findByStudentIdAndQuestionIdAndIsCorrectOrderBySubmissionTimeDesc(
+    student_id: string, question_id: number, is_correct: boolean
+  ): Promise<Submission[]> {
+    return await this.submissionRepository.find({
+      where: {
+        student_id: student_id,
+        question_id: question_id,
+        is_correct: is_correct
+      },
+      order: {
+        submission_time: "DESC"
+      }
+    });
+  }
+
+  async findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id: string, question_id: number): Promise<Submission[]> {
     return await this.submissionRepository.find({
       where: {
         student_id: student_id,
