@@ -12,23 +12,32 @@ import { QueueWorkerCallback } from 'queue';
 import { SUBMISSION_STATUS } from './submission/constants/submission.constant';
 import { StudentDto } from './student/dto/student.dto';
 import { SubmitDto } from './admin.dto';
+import { LeaderboardDTO } from './submission/dto/leaderboard.dto';
+import { sign } from 'crypto';
 
 @Injectable()
 export class AdminService {
   constructor(
-    @InjectDataSource("admin") private readonly adminDataSource: DataSource,
-    @InjectDataSource("participant") private readonly participantDataSource: DataSource,
+    @InjectDataSource('admin') private readonly adminDataSource: DataSource,
+    @InjectDataSource('participant')
+    private readonly participantDataSource: DataSource,
     private readonly queueService: QueueService,
     private readonly questionService: QuestionService,
     private readonly studentService: StudentService,
-    private readonly submissionService: SubmissionService
-  ) { }
+    private readonly submissionService: SubmissionService,
+  ) {}
 
-  async setupQuestion(schema_name: string, question_schema: string, question_data: string): Promise<void> {
+  async setupQuestion(
+    schema_name: string,
+    question_schema: string,
+    question_data: string,
+  ): Promise<void> {
     const queryRunner = this.adminDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
-    await queryRunner.query(`alter default privileges for role ${process.env.ADMIN_USERNAME} in schema ${schema_name} grant select on tables to ${process.env.PARTICIPANT_USERNAME};`);
+    await queryRunner.query(
+      `alter default privileges for role ${process.env.ADMIN_USERNAME} in schema ${schema_name} grant select on tables to ${process.env.PARTICIPANT_USERNAME};`,
+    );
     await queryRunner.query(`SET LOCAL SEARCH_PATH=${schema_name}`);
     await queryRunner.query(question_schema);
     await queryRunner.query(question_data);
@@ -40,41 +49,79 @@ export class AdminService {
     return this.submissionService.findByKey(key);
   }
 
-  async getAllSubmissions(student_id: string, question_id: number): Promise<SubmissionDto[]> {
-    return await this.submissionService.findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(student_id, question_id);
+  async getAllSubmissions(
+    student_id: string,
+    question_id: number,
+  ): Promise<SubmissionDto[]> {
+    return await this.submissionService.findByStudentIdAndQuestionIdOrderBySubmissionTimeDesc(
+      student_id,
+      question_id,
+    );
   }
 
-  async getAllCorrectSubmissions(student_id: string, question_id: number): Promise<SubmissionDto[]> {
-    return await this.submissionService.findByStudentIdAndQuestionIdAndIsCorrectOrderBySubmissionTimeDesc(student_id, question_id, true);
+  async getAllCorrectSubmissions(
+    student_id: string,
+    question_id: number,
+  ): Promise<SubmissionDto[]> {
+    return await this.submissionService.findByStudentIdAndQuestionIdAndIsCorrectOrderBySubmissionTimeDesc(
+      student_id,
+      question_id,
+      true,
+    );
   }
 
-  async queueSubmissionEvaluation(studentDto: StudentDto, createSubmissionDto: CreateSubmissionDto): Promise<SubmissionDto> {
+  async getLeaderboard(
+    student_id: string,
+    question_id: number,
+    page: number,
+    size: number,
+  ): Promise<LeaderboardDTO> {
+    return await this.submissionService.getLeaderboard(
+      student_id,
+      question_id,
+      page,
+      size,
+    );
+  }
+
+  async queueSubmissionEvaluation(
+    studentDto: StudentDto,
+    createSubmissionDto: CreateSubmissionDto,
+  ): Promise<SubmissionDto> {
     await this.createStudentIfNotExist(studentDto);
 
     const submission = await this.submissionService.create(createSubmissionDto);
 
-    const question = await this.questionService.findByKey(submission.question_id);
+    const question = await this.questionService.findByKey(
+      submission.question_id,
+    );
     const resetStatRunner = this.adminDataSource.createQueryRunner();
     const queryRunner = this.participantDataSource.createQueryRunner();
     const service = this.submissionService;
-    
+
     const task = async function (cb: QueueWorkerCallback) {
-      var result = [];
-      var analysis = null;
+      let result = [];
+      let analysis = null;
       try {
         // admin permissions required to reset pg stat tables
         await resetStatRunner.connect();
         // reset pg_stat tables
-        await resetStatRunner.query("SELECT pg_stat_reset();")
+        await resetStatRunner.query('SELECT pg_stat_reset();');
         await resetStatRunner.release();
 
         await queryRunner.connect();
         await queryRunner.startTransaction();
         // set statement timeout for transaction
-        await queryRunner.query(`SET LOCAL SEARCH_PATH = ${question.schema_name}`)
-        await queryRunner.query(`SET LOCAL statement_timeout='${question.max_timeout}ms';`);
+        await queryRunner.query(
+          `SET LOCAL SEARCH_PATH = ${question.schema_name}`,
+        );
+        await queryRunner.query(
+          `SET LOCAL statement_timeout='${question.max_timeout}ms';`,
+        );
         // get query plan
-        analysis = await queryRunner.query(`EXPLAIN ANALYZE ${submission.query}`);
+        analysis = await queryRunner.query(
+          `EXPLAIN ANALYZE ${submission.query}`,
+        );
         // get query results
         result = await queryRunner.query(submission.query);
         await queryRunner.commitTransaction();
@@ -86,8 +133,12 @@ export class AdminService {
 
       // parse planning and execution time from query plan
       if (analysis != null) {
-        submission.planning_time = parseFloat(analysis[analysis.length - 2]["QUERY PLAN"].substring(15, 20));
-        submission.execution_time = parseFloat(analysis[analysis.length - 1]["QUERY PLAN"].substring(16, 21));
+        submission.planning_time = parseFloat(
+          analysis[analysis.length - 2]['QUERY PLAN'].substring(15, 20),
+        );
+        submission.execution_time = parseFloat(
+          analysis[analysis.length - 1]['QUERY PLAN'].substring(16, 21),
+        );
       }
 
       let is_correct = true;
@@ -97,9 +148,12 @@ export class AdminService {
         const expected_row = question.answer_data[i];
         const keys = Object.keys(expected_row);
         let is_row_correct = true;
-        for (let key of keys) {
+        for (const key of keys) {
           // if key in expected row is not in actual row or the value is different
-          if (!actual_row.hasOwnProperty(key) || actual_row[key] !== expected_row[key]) {
+          if (
+            !actual_row.hasOwnProperty(key) ||
+            actual_row[key] !== expected_row[key]
+          ) {
             is_row_correct = false;
             break;
           }
@@ -113,7 +167,7 @@ export class AdminService {
       submission.is_correct = is_correct;
 
       cb(null, { submission });
-    }
+    };
 
     // timeout here is different from the statement timeout
     // this timeout refers to the timeout for the queue task, NOT for the query execution
@@ -125,33 +179,45 @@ export class AdminService {
       const submission = result.submission;
       submission.status = SUBMISSION_STATUS.COMPLETED;
       await service.update(
-        { student_id: submission.student_id, question_id: submission.question_id, submission_time: submission.submission_time },
-        submission
+        {
+          student_id: submission.student_id,
+          question_id: submission.question_id,
+          submission_time: submission.submission_time,
+        },
+        submission,
       );
-    }
+    };
 
     task.handleTimeout = async function () {
       submission.status = SUBMISSION_STATUS.FAILED;
       await service.update(
-        { student_id: submission.student_id, question_id: submission.question_id, submission_time: submission.submission_time }, 
-        submission
+        {
+          student_id: submission.student_id,
+          question_id: submission.question_id,
+          submission_time: submission.submission_time,
+        },
+        submission,
       );
-    }
+    };
 
     task.handleError = async function (err: Error) {
       // recognize statement timeout error
-      if (err.message === "canceling statement due to statement timeout") {
+      if (err.message === 'canceling statement due to statement timeout') {
         submission.status = SUBMISSION_STATUS.TIMEOUT;
       } else {
         submission.status = SUBMISSION_STATUS.FAILED;
       }
       await service.update(
-        { student_id: submission.student_id, question_id: submission.question_id, submission_time: submission.submission_time },
-        submission
+        {
+          student_id: submission.student_id,
+          question_id: submission.question_id,
+          submission_time: submission.submission_time,
+        },
+        submission,
       );
-    }
-    
-    this.queueService.addTask(task)
+    };
+
+    this.queueService.addTask(task);
 
     return submission;
   }
