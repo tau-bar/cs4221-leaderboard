@@ -5,4 +5,5 @@ export const ROUTES = {
   QUESTION: '/question/:id',
   QUESTION_SUBMISSIONS: '/question/:id/submissions',
   LEADERBOARD: '/leaderboard/:id',
+  ADDQUESTIONS: '/addquestion',
 };

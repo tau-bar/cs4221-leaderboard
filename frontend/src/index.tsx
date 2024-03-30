@@ -10,6 +10,7 @@ import reportWebVitals from './reportWebVitals';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
@@ -21,6 +22,7 @@ root.render(
         <BrowserRouter>
           <Notifications />
           <App />
+          <Notifications />
         </BrowserRouter>
       </MantineProvider>
     </React.StrictMode>

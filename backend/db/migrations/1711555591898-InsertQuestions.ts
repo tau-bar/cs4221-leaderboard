@@ -21,6 +21,8 @@ export class InsertQuestions1711555591898 implements MigrationInterface {
                 question.max_timeout
             ]);
         }
+
+        await queryRunner.query(`ALTER SEQUENCE admin.question_id_seq RESTART WITH 11`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

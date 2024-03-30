@@ -4,6 +4,7 @@ import HomePage from '../pages/HomePage';
 import Question from '../pages/Question';
 import QuestionSubmissions from '../pages/QuestionSubmissions';
 import Leaderboard from '../pages/Leaderboard';
+import AddQuestion from '../pages/AddQuestion';
 
 export const StudentRoutes = [
   <Route key={ROUTES.HOME} path={ROUTES.HOME} element={<HomePage />} />,
@@ -17,5 +18,10 @@ export const StudentRoutes = [
     key={ROUTES.LEADERBOARD}
     path={ROUTES.LEADERBOARD}
     element={<Leaderboard />}
+  />,
+  <Route
+    key={ROUTES.ADDQUESTIONS}
+    path={ROUTES.ADDQUESTIONS}
+    element={<AddQuestion />}
   />,
 ];
