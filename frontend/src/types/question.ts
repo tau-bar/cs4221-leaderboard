@@ -1,3 +1,5 @@
+import { QuestionStatus } from '../api/question';
+
 export type QuestionDto = {
   id: number;
   question_name: string;
@@ -26,3 +28,15 @@ export type Response = {
   data: QuestionDto;
   error: string;
 }
+
+export type SubmissionDto = {
+  student_id: number;
+  question_id: number;
+  submission_time: string;
+  is_correct: boolean;
+  planning_time: number;
+  execution_time: number;
+  query: string;
+  status: QuestionStatus;
+};
+
