@@ -57,6 +57,34 @@ const Leaderboard = () => {
     return '#e8f3fc';
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    // Correctly typed options for TypeScript
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    };
+
+    // Using toLocaleString to combine date and time formatting in one go
+    let formattedDate = date.toLocaleString('en-US', options);
+
+    // Custom rearrangement to DD-MM-YYYY TIME AM/PM format
+    // Extract parts using regex from the formatted string
+    const matches = formattedDate.match(
+      /(\d{2})\/(\d{2})\/(\d{4}), (\d{2}:\d{2}:\d{2}) (AM|PM)/,
+    );
+    if (matches) {
+      // Reorder and format the date string as per requirement
+      formattedDate = `${matches[2]}-${matches[1]}-${matches[3]} ${matches[4]} ${matches[5]}`;
+    }
+
+    return formattedDate;
+  };
   return (
     <Container>
       <Title>Leaderboard for question {id}</Title>
@@ -65,7 +93,7 @@ const Leaderboard = () => {
           <Text>Your submission:</Text>
           <Text>
             Rank <b>{current_student?.rank}</b>, Total Time:{' '}
-            {current_student?.totalTime} sec
+            {current_student?.totalTime} ms
           </Text>
         </Card>
       ) : (
@@ -99,10 +127,10 @@ const Leaderboard = () => {
               >
                 <Table.Td>{entry.rank}</Table.Td>
                 <Table.Td>{entry.studentName}</Table.Td>
-                <Table.Td>{entry.submittedDate}</Table.Td>
-                <Table.Td>{entry.executionTime} sec</Table.Td>
-                <Table.Td>{entry.planningTime} sec</Table.Td>
-                <Table.Td>{entry.totalTime} sec</Table.Td>
+                <Table.Td>{formatDate(entry.submittedDate)}</Table.Td>
+                <Table.Td>{entry.executionTime} ms</Table.Td>
+                <Table.Td>{entry.planningTime} ms</Table.Td>
+                <Table.Td>{entry.totalTime} ms</Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
