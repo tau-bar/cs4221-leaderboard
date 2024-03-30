@@ -14,7 +14,7 @@ export class QuestionService {
     private readonly questionRepository: Repository<Question>,
   ) { }
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
-    const { schema_name, question_schema, question_data, answer_data } = createQuestionDto;
+    const { schema_name, question_schema, question_data, answer_data, sample_answer } = createQuestionDto;
     const queryRunner = this.dataSource.createQueryRunner();
 
     let question;
@@ -28,6 +28,7 @@ export class QuestionService {
       await queryRunner.query(`SET LOCAL SEARCH_PATH = ${schema_name}`);
       await queryRunner.query(question_schema);
       await queryRunner.query(question_data);
+      await queryRunner.query(sample_answer);
       await queryRunner.query('SET LOCAL SEARCH_PATH = public');
       question = await this.questionRepository.save(createQuestionDto);
       await queryRunner.commitTransaction();
