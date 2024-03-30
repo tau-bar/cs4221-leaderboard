@@ -15,24 +15,20 @@ export class QuestionService {
     private readonly questionRepository: Repository<Question>,
   ) { }
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
-    const { schema_name, question_schema, question_data, answer_data, sample_answer } = createQuestionDto;
+    const { schema_name, question_schema, question_data, sample_answer } = createQuestionDto;
     const queryRunner = this.dataSource.createQueryRunner();
 
     let question;
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      const parsed = JSON.parse(answer_data);
-      if (!Array.isArray(parsed) || !parsed.every(obj => typeof obj === 'object')) {
-        throw new Error("Sample answer data should be an array of objects");
-      }
       await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
       await queryRunner.query(`GRANT USAGE ON SCHEMA ${schema_name} TO ${process.env.PARTICIPANT_USERNAME};`)
       await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${schema_name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
       await queryRunner.query(`SET LOCAL SEARCH_PATH = ${schema_name}`);
       await queryRunner.query(question_schema);
       await queryRunner.query(question_data);
-      await queryRunner.query(sample_answer);
+      createQuestionDto.answer_data = JSON.stringify(await queryRunner.query(sample_answer));
       await queryRunner.query('SET LOCAL SEARCH_PATH = public');
       question = await this.questionRepository.save(createQuestionDto);
       await queryRunner.commitTransaction();
