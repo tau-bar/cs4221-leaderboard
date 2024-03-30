@@ -11,9 +11,9 @@ import { SubmissionDto } from './submission/dto/submission.dto';
 import { QueueWorkerCallback } from 'queue';
 import { SUBMISSION_STATUS } from './submission/constants/submission.constant';
 import { StudentDto } from './student/dto/student.dto';
-import { SubmitDto } from './admin.dto';
 import { LeaderboardDTO } from './submission/dto/leaderboard.dto';
 import { sign } from 'crypto';
+import { timeout } from 'rxjs';
 
 @Injectable()
 export class AdminService {
@@ -99,31 +99,52 @@ export class AdminService {
     const queryRunner = this.participantDataSource.createQueryRunner();
     const service = this.submissionService;
 
+    const run_count = parseInt(process.env.RUN_COUNT);
+
     const task = async function (cb: QueueWorkerCallback) {
-      let result = [];
-      let analysis = null;
+      var expected_result = [];
+      var actual_result = [];
+      var analysis = null;
+      const planning_times = [];
+      const execution_times = [];
       try {
         // admin permissions required to reset pg stat tables
         await resetStatRunner.connect();
-        // reset pg_stat tables
+        // reset pg_stat tables + free used space + analyze tables
         await resetStatRunner.query('SELECT pg_stat_reset();');
+        await resetStatRunner.query('VACUUM ANALYZE;');
         await resetStatRunner.release();
 
         await queryRunner.connect();
         await queryRunner.startTransaction();
         // set statement timeout for transaction
         await queryRunner.query(
-          `SET LOCAL SEARCH_PATH = ${question.schema_name}`,
+          `SET LOCAL SEARCH_PATH = ${question.schema_name};`,
         );
         await queryRunner.query(
           `SET LOCAL statement_timeout='${question.max_timeout}ms';`,
         );
         // get query plan
-        analysis = await queryRunner.query(
-          `EXPLAIN ANALYZE ${submission.query}`,
-        );
+        for (let i = 0; i < run_count; i++) {
+          analysis = await queryRunner.query(
+            `EXPLAIN ANALYZE ${submission.query}`,
+          );
+          if (analysis != null) {
+            planning_times.push(
+              parseFloat(
+                analysis[analysis.length - 2]['QUERY PLAN'].substring(15, 20),
+              ),
+            );
+            execution_times.push(
+              parseFloat(
+                analysis[analysis.length - 1]['QUERY PLAN'].substring(16, 21),
+              ),
+            );
+          }
+        }
         // get query results
-        result = await queryRunner.query(submission.query);
+        expected_result = await queryRunner.query(question.sample_answer);
+        actual_result = await queryRunner.query(submission.query);
         await queryRunner.commitTransaction();
         await queryRunner.release();
       } catch (error) {
@@ -132,47 +153,58 @@ export class AdminService {
       }
 
       // parse planning and execution time from query plan
-      if (analysis != null) {
-        submission.planning_time = parseFloat(
-          analysis[analysis.length - 2]['QUERY PLAN'].substring(15, 20),
-        );
+      if (planning_times.length > 0) {
+        const average_planning_time =
+          planning_times.reduce((a, b) => a + b) / planning_times.length;
+        submission.planning_time = parseFloat(average_planning_time.toFixed(2));
+      }
+
+      if (execution_times.length > 0) {
+        const average_execution_time =
+          execution_times.reduce((a, b) => a + b) / execution_times.length;
         submission.execution_time = parseFloat(
-          analysis[analysis.length - 1]['QUERY PLAN'].substring(16, 21),
+          average_execution_time.toFixed(2),
         );
       }
 
-      let is_correct = true;
       // verify correctness of query
-      for (let i = 0; i < result.length; i++) {
-        const actual_row = result[i];
-        const expected_row = question.answer_data[i];
-        const keys = Object.keys(expected_row);
-        let is_row_correct = true;
-        for (const key of keys) {
-          // if key in expected row is not in actual row or the value is different
-          if (
-            !actual_row.hasOwnProperty(key) ||
-            actual_row[key] !== expected_row[key]
-          ) {
-            is_row_correct = false;
+      let is_correct = true;
+      if (expected_result.length !== actual_result.length) {
+        is_correct = false;
+      } else {
+        for (let i = 0; i < expected_result.length; i++) {
+          const actual_row = actual_result[i];
+          const expected_row = expected_result[i];
+          const keys = Object.keys(expected_row);
+          let is_row_correct = true;
+          for (let key of keys) {
+            // if key in expected row is not in actual row or the value is different
+            if (
+              !actual_row.hasOwnProperty(key) ||
+              actual_row[key] !== expected_row[key]
+            ) {
+              is_row_correct = false;
+              break;
+            }
+          }
+          if (!is_row_correct) {
+            is_correct = false;
             break;
           }
-        }
-        if (!is_row_correct) {
-          is_correct = false;
-          break;
         }
       }
 
       submission.is_correct = is_correct;
-
       cb(null, { submission });
     };
 
     // timeout here is different from the statement timeout
     // this timeout refers to the timeout for the queue task, NOT for the query execution
     // 5 is arbitrary, but should be enough to handle most evaluation cases
-    task.timeout = question.max_timeout * 5;
+    const queue_timeout_multiplier = parseInt(
+      process.env.QUEUE_TIMEOUT_MULTIPLIER,
+    );
+    task.timeout = question.max_timeout * run_count * queue_timeout_multiplier;
 
     // handleSuccess, handleError, and handleTimeout are callback functions that are called when the task is done
     task.handleSuccess = async function (result: any) {
