@@ -88,9 +88,6 @@ const Leaderboard = () => {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {data.length === 0 && (
-              <Alert color="red">No submissions yet!</Alert>
-            )}
             {pagedData.map((entry) => (
               <Table.Tr
                 key={entry.rank}
@@ -109,6 +106,9 @@ const Leaderboard = () => {
               </Table.Tr>
             ))}
           </Table.Tbody>
+          {data.length === 0 && (
+            <Table.Caption>No submissions yet!</Table.Caption>
+          )}
         </Table>
         <Pagination
           total={Math.ceil(total / ITEMS_PER_PAGE)}
