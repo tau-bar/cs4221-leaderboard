@@ -160,7 +160,7 @@ const AddQuestion = () => {
       />
       <TextInput
         label="Sample Answer Data"
-        placeholder="Enter answer data in JSON format"
+        placeholder="Enter answer data as an array of JSON objects"
         required
         value={formData.answer_data}
         onChange={(e) => handleChange('answer_data', e.target.value)}
