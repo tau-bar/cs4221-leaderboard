@@ -82,7 +82,7 @@ const AddQuestion = () => {
     <>
     {!authenticated &&
     <Container size="sm">
-        <h1>Enter Password</h1>
+        <h1>You need to be authorised to add questions to the database</h1>
           <TextInput
             label="Password"
             type="password"
