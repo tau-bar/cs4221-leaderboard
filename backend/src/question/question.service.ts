@@ -4,6 +4,7 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Question } from './entities/question.entity';
+import { error } from 'console';
 
 @Injectable()
 export class QuestionService {
@@ -21,7 +22,10 @@ export class QuestionService {
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      JSON.parse(answer_data);
+      const parsed = JSON.parse(answer_data);
+      if (!Array.isArray(parsed) || !parsed.every(obj => typeof obj === 'object')) {
+        throw new Error("Sample answer data should be an array of objects");
+      }
       await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
       await queryRunner.query(`GRANT USAGE ON SCHEMA ${schema_name} TO ${process.env.PARTICIPANT_USERNAME};`)
       await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${schema_name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
