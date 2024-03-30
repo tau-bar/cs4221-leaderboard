@@ -4,10 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Submission } from './entities/submission.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Submission], "admin")
-  ],
+  imports: [TypeOrmModule.forFeature([Submission], 'admin')],
   providers: [SubmissionService],
-  exports: [SubmissionService]
+  exports: [SubmissionService],
 })
 export class SubmissionModule {}
