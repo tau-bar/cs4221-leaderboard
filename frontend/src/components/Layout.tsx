@@ -2,6 +2,7 @@ import React from 'react';
 import {
   ActionIcon,
   AppShell,
+  Button,
   Flex,
   Group,
   Title,
@@ -40,6 +41,7 @@ export function Layout(props: { children: React.ReactNode }) {
             <Title>Leaderboard</Title>
           </RouterLink>
           <Group>
+            <Button onClick={() => navigate(ROUTES.ADDQUESTIONS)}>Add Question</Button>
             <ActionIcon
               size="lg"
               variant="default"

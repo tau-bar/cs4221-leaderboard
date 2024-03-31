@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { QuestionDto, SubmissionDto } from '../types/question';
 import { GoogleUserInfo } from '../types/oauth';
 
-const API_URL = process.env.REACT_APP_API_URL || 'localhost:3000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 export async function getQuestion(id: number): Promise<QuestionDto | null> {
   const resp = await axios.get<QuestionDto>(`${API_URL}/question/${id}`);

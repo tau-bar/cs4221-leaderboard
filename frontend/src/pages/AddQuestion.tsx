@@ -82,7 +82,7 @@ const AddQuestion = () => {
     <>
     {!authenticated &&
     <Container size="sm">
-        <h1>Enter Password</h1>
+        <h1>You need to be authorised to add questions to the database</h1>
           <TextInput
             label="Password"
             type="password"
@@ -156,14 +156,6 @@ const AddQuestion = () => {
         required
         value={formData.sample_answer}
         onChange={(e) => handleChange('sample_answer', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <TextInput
-        label="Sample Answer Data"
-        placeholder="Enter answer data in JSON format"
-        required
-        value={formData.answer_data}
-        onChange={(e) => handleChange('answer_data', e.target.value)}
         style={{ marginBottom: '15px' }}
       />
       <TextInput

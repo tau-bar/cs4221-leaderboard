@@ -4,6 +4,7 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Question } from './entities/question.entity';
+import { error } from 'console';
 
 @Injectable()
 export class QuestionService {
@@ -14,20 +15,21 @@ export class QuestionService {
     private readonly questionRepository: Repository<Question>,
   ) { }
   async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
-    const { schema_name, question_schema, question_data, answer_data } = createQuestionDto;
+    const { schema_name, question_schema, question_data, sample_answer } = createQuestionDto;
     const queryRunner = this.dataSource.createQueryRunner();
 
     let question;
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      JSON.parse(answer_data);
       await queryRunner.query(`CREATE SCHEMA ${schema_name}`);
       await queryRunner.query(`GRANT USAGE ON SCHEMA ${schema_name} TO ${process.env.PARTICIPANT_USERNAME};`)
       await queryRunner.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${process.env.ADMIN_USERNAME} IN SCHEMA ${schema_name} GRANT SELECT ON TABLES TO ${process.env.PARTICIPANT_USERNAME}`);
       await queryRunner.query(`SET LOCAL SEARCH_PATH = ${schema_name}`);
       await queryRunner.query(question_schema);
       await queryRunner.query(question_data);
+      console.log(await queryRunner.query(sample_answer));
+      createQuestionDto.answer_data = JSON.stringify((await queryRunner.query(sample_answer.replace(/;+$/, '') + " LIMIT 5")));
       await queryRunner.query('SET LOCAL SEARCH_PATH = public');
       question = await this.questionRepository.save(createQuestionDto);
       await queryRunner.commitTransaction();
