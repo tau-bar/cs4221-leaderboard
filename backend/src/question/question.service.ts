@@ -28,7 +28,8 @@ export class QuestionService {
       await queryRunner.query(`SET LOCAL SEARCH_PATH = ${schema_name}`);
       await queryRunner.query(question_schema);
       await queryRunner.query(question_data);
-      createQuestionDto.answer_data = JSON.stringify(await queryRunner.query(sample_answer));
+      console.log(await queryRunner.query(sample_answer));
+      createQuestionDto.answer_data = JSON.stringify((await queryRunner.query(sample_answer.replace(/;(?=[^;]*$)/, '') + " LIMIT 5")));
       await queryRunner.query('SET LOCAL SEARCH_PATH = public');
       question = await this.questionRepository.save(createQuestionDto);
       await queryRunner.commitTransaction();
