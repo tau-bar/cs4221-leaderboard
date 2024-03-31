@@ -30,7 +30,9 @@ const Podium = ({ data }: PodiumProps) => {
         >
           <Stack align="center" gap="md">
             <Title>2nd</Title>
-            <Text size="xl">{second.studentName}</Text>
+            <Text size="xl" lineClamp={1}>
+              {second.studentName}
+            </Text>
             <Text size="md">{second.totalTime} ms</Text>
             <Text style={{ fontSize: 60, marginTop: -10 }}>🥈</Text>
           </Stack>
@@ -52,7 +54,9 @@ const Podium = ({ data }: PodiumProps) => {
         >
           <Stack align="center" gap="lg">
             <Title>1st</Title>
-            <Text size="xl">{first.studentName}</Text>
+            <Text size="xl" lineClamp={1}>
+              {first.studentName}
+            </Text>
             <Text size="md">{first.totalTime} ms</Text>
             <Text style={{ fontSize: 60, marginTop: -10 }}>🥇</Text>
           </Stack>
@@ -74,7 +78,9 @@ const Podium = ({ data }: PodiumProps) => {
         >
           <Stack align="center" gap="xs">
             <Title>3rd</Title>
-            <Text size="xl">{third.studentName}</Text>
+            <Text size="xl" lineClamp={1}>
+              {third.studentName}
+            </Text>
             <Text size="md">{third.totalTime} ms</Text>
             <Text style={{ fontSize: 60, marginTop: -10 }}>🥉</Text>
           </Stack>
