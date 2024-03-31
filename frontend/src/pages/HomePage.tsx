@@ -1,4 +1,4 @@
-import { Anchor, Flex, Pagination, Table, Title } from '@mantine/core';
+import { Anchor, Flex, Loader, Pagination, Table, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { ROUTES } from '../constants/routes';
 import { QuestionDto } from '../types/question';
@@ -10,6 +10,7 @@ const HomePage = () => {
 
   const [totalQuestionCount, setTotalQuestionCount] = useState(0);
   const [questions, setQuestions] = useState<QuestionDto[]>([]);
+  const [isloading, setLoading] = useState(true);
 
   useEffect(() => {
     getQuestionCount()
@@ -24,6 +25,7 @@ const HomePage = () => {
   useEffect(() => {
     getQuestions(currentPage)
       .then((data) => {
+        setLoading(false);
         setQuestions(data);
       })
       .catch((error) => {
@@ -69,7 +71,13 @@ const HomePage = () => {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
+          {isloading && (
+            <Table.Caption>
+              <Loader color="blue" />
+            </Table.Caption>
+          )}
         </Table>
+
         <Pagination
           total={Math.ceil(totalQuestionCount / ITEMS_PER_PAGE)}
           value={currentPage}
