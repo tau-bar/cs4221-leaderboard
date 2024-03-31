@@ -4,15 +4,16 @@ import {
   Badge,
   Button,
   Code,
+  Container,
+  Flex,
   Popover,
-  Stack,
   Table,
   Text,
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCopy } from '@tabler/icons-react';
+import { IconArrowLeft, IconCopy } from '@tabler/icons-react';
 import { DateTime } from 'luxon';
 
 import { useUserStore } from '../store/userStore';
@@ -45,7 +46,9 @@ function QueryDisplay({ query }: { query: string }) {
         </Button>
       </Popover.Target>
       <Popover.Dropdown style={{ pointerEvents: 'none' }}>
-        <Code styles={{ root: { fontSize: 16 } }}>{query}</Code>
+        <Code block styles={{ root: { fontSize: 16 } }}>
+          {query}
+        </Code>
       </Popover.Dropdown>
     </Popover>
   );
@@ -129,14 +132,7 @@ export default function QuestionSubmissions() {
   ));
 
   const table = (
-    <Table
-      withTableBorder
-      striped
-      highlightOnHover
-      stickyHeader
-      my={10}
-      w={'70%'}
-    >
+    <Table withTableBorder striped highlightOnHover stickyHeader my={10}>
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Query</Table.Th>
@@ -152,8 +148,15 @@ export default function QuestionSubmissions() {
   );
 
   return (
-    <Stack align="center" flex={1}>
-      <Title order={2}>Question Submissions</Title>
+    <Container size="xl">
+      <Flex gap="sm">
+        <Link to={ROUTES.QUESTION.replace(':id', id ?? '')}>
+          <Button variant="default" leftSection={<IconArrowLeft />}>
+            Question
+          </Button>
+        </Link>
+        <Title order={2}>My Submissions</Title>
+      </Flex>
       {rows.length > 0 ? (
         table
       ) : (
@@ -162,6 +165,6 @@ export default function QuestionSubmissions() {
           <Link to={ROUTES.QUESTION.replace(':id', id)}>Attempt question</Link>
         </Text>
       )}
-    </Stack>
+    </Container>
   );
 }
