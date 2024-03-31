@@ -14,6 +14,8 @@ import {
 import Podium from '../components/podium';
 import { LeaderboardEntry, getLeaderboard } from '../api/leaderboard';
 import { useUserStore } from '../store/userStore';
+import { getQuestion } from '../api/question';
+import { QuestionDto } from '../types/question';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,28 +29,37 @@ const Leaderboard = () => {
   const { id } = useParams();
   const { colorScheme } = useMantineColorScheme();
   const { profile } = useUserStore();
+  const [question, setQuestion] = useState<QuestionDto | null>();
 
   useEffect(() => {
+    if (!id) return;
+    getQuestion(parseInt(id)).then((question) => {
+      setQuestion(question);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    getLeaderboardQuery();
+  }, [id, profile, currentPage]);
+
+  const getLeaderboardQuery = async () => {
     if (!id || !profile) return;
-    getLeaderboard(
+
+    const leaderboard = await getLeaderboard(
       profile.id,
       Number.parseInt(id),
       currentPage,
       ITEMS_PER_PAGE,
-    ).then((leaderboard) => {
-      setData(leaderboard.leaderboardEntries);
-      setCurrentStudent(leaderboard.curr_student);
-      setTotal(leaderboard.total);
-      if (currentPage === 1) {
-        // slice the top 3 entries for the podium
-        setTopThree(leaderboard.leaderboardEntries.slice(0, 3));
-      }
-    });
-  }, [id, profile, currentPage]);
-
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const pagedData = data.slice(startIndex, endIndex);
+    );
+    console.log('Setting leaderboard data for page', currentPage, leaderboard);
+    setData(leaderboard.leaderboardEntries);
+    setCurrentStudent(leaderboard.curr_student);
+    setTotal(leaderboard.total);
+    if (currentPage === 1) {
+      // slice the top 3 entries for the podium
+      setTopThree(leaderboard.leaderboardEntries.slice(0, 3));
+    }
+  };
 
   const getHighlightColor = () => {
     if (colorScheme === 'dark') {
@@ -87,7 +98,9 @@ const Leaderboard = () => {
   };
   return (
     <Container>
-      <Title>Leaderboard for question {id}</Title>
+      <Title>
+        Leaderboard for #{id} {question?.question_name}
+      </Title>
       {current_student ? (
         <Card mt={5}>
           <Text>Your submission:</Text>
@@ -116,7 +129,7 @@ const Leaderboard = () => {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {pagedData.map((entry) => (
+            {data.map((entry) => (
               <Table.Tr
                 key={entry.rank}
                 style={{

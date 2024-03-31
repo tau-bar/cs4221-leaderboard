@@ -38,10 +38,12 @@ export function Layout(props: { children: React.ReactNode }) {
             to={ROUTES.HOME}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <Title>Leaderboard</Title>
+            <Title>L33tderboard</Title>
           </RouterLink>
           <Group>
-            <Button onClick={() => navigate(ROUTES.ADDQUESTIONS)}>Add Question</Button>
+            <Button onClick={() => navigate(ROUTES.ADDQUESTIONS)}>
+              Add Question
+            </Button>
             <ActionIcon
               size="lg"
               variant="default"
