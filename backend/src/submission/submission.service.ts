@@ -149,7 +149,7 @@ export class SubmissionService {
         executionTime: Number(submission.execution_time),
         planningTime: Number(submission.planning_time),
         totalTime: Number(submission.total_time),
-        isCurrentUser: submission.studentId === student_id,
+        isCurrentUser: submission.student_id === student_id,
       }),
     );
 
