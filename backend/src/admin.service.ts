@@ -12,8 +12,7 @@ import { QueueWorkerCallback } from 'queue';
 import { SUBMISSION_STATUS } from './submission/constants/submission.constant';
 import { StudentDto } from './student/dto/student.dto';
 import { LeaderboardDTO } from './submission/dto/leaderboard.dto';
-import { sign } from 'crypto';
-import { timeout } from 'rxjs';
+import { isEqual } from 'lodash';
 
 @Injectable()
 export class AdminService {
@@ -180,8 +179,7 @@ export class AdminService {
           for (let key of keys) {
             // if key in expected row is not in actual row or the value is different
             if (
-              !actual_row.hasOwnProperty(key) ||
-              actual_row[key] !== expected_row[key]
+              !actual_row.hasOwnProperty(key) || !isEqual(actual_row[key], expected_row[key])
             ) {
               is_row_correct = false;
               break;
@@ -221,6 +219,7 @@ export class AdminService {
     };
 
     task.handleTimeout = async function () {
+      console.log(`Timeout for submission {${submission.student_id},${submission.question_id},${submission.submission_time}}`)
       submission.status = SUBMISSION_STATUS.FAILED;
       await service.update(
         {
@@ -233,6 +232,7 @@ export class AdminService {
     };
 
     task.handleError = async function (err: Error) {
+      console.log(err.message)
       // recognize statement timeout error
       if (err.message === 'canceling statement due to statement timeout') {
         submission.status = SUBMISSION_STATUS.TIMEOUT;
