@@ -115,8 +115,16 @@ export default function QuestionSubmissions() {
           {submission.is_correct ? '✅ Correct' : '❌ Incorrect'}
         </Badge>
       </Table.Td>
-      <Table.Td>{submission.planning_time} ms</Table.Td>
-      <Table.Td>{submission.execution_time} ms</Table.Td>
+      <Table.Td>
+        {submission.status === QuestionStatus.COMPLETED
+          ? `${submission.planning_time} ms`
+          : '-'}
+      </Table.Td>
+      <Table.Td>
+        {submission.status === QuestionStatus.COMPLETED
+          ? `${submission.execution_time} ms`
+          : '-'}
+      </Table.Td>
     </Table.Tr>
   ));
 
