@@ -151,19 +151,23 @@ export class AdminService {
         throw error;
       }
 
-      // parse planning and execution time from query plan
+      // calculate median planning time and execution time
       if (planning_times.length > 0) {
-        const average_planning_time =
-          planning_times.reduce((a, b) => a + b) / planning_times.length;
-        submission.planning_time = parseFloat(average_planning_time.toFixed(2));
+        planning_times.sort((a, b) => a - b);
+        const half = Math.floor(planning_times.length / 2);
+        submission.planning_time = planning_times.length % 2
+          ? planning_times[half]
+          : (planning_times[half - 1] + planning_times[half]) / 2;
+        submission.planning_time = parseFloat(submission.planning_time.toFixed(2));
       }
 
       if (execution_times.length > 0) {
-        const average_execution_time =
-          execution_times.reduce((a, b) => a + b) / execution_times.length;
-        submission.execution_time = parseFloat(
-          average_execution_time.toFixed(2),
-        );
+        execution_times.sort((a, b) => a - b);
+        const half = Math.floor(execution_times.length / 2);
+        submission.execution_time = execution_times.length % 2
+          ? execution_times[half]
+          : (execution_times[half - 1] + execution_times[half]) / 2;
+        submission.execution_time = parseFloat(submission.execution_time.toFixed(2));
       }
 
       // verify correctness of query
