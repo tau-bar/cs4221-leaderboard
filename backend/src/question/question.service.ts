@@ -52,6 +52,9 @@ export class QuestionService {
     return await this.questionRepository.find({
       skip: (page - 1) * limit,
       take: limit,
+      order: {
+        id: "ASC"
+      }
     });
   }
 
