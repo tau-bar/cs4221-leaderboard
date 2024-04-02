@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Table,
@@ -10,12 +10,16 @@ import {
   Card,
   Title,
   useMantineColorScheme,
+  Button,
+  Flex,
 } from '@mantine/core';
 import Podium from '../components/podium';
 import { LeaderboardEntry, getLeaderboard } from '../api/leaderboard';
 import { useUserStore } from '../store/userStore';
 import { getQuestion } from '../api/question';
 import { QuestionDto } from '../types/question';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { ROUTES } from '../constants/routes';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -98,9 +102,16 @@ const Leaderboard = () => {
   };
   return (
     <Container>
-      <Title>
-        Leaderboard for #{id} {question?.question_name}
-      </Title>
+      <Flex gap="sm">
+        <Link to={ROUTES.QUESTION.replace(':id', id ?? '')}>
+          <Button variant="default" leftSection={<IconArrowLeft />}>
+            Question
+          </Button>
+        </Link>
+        <Title order={2}>
+          Leaderboard for #{id} {question?.question_name}
+        </Title>
+      </Flex>
       {current_student ? (
         <Card mt={5}>
           <Text>Your submission:</Text>

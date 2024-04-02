@@ -15,7 +15,7 @@ import 'monaco-sql-languages/out/esm/pgsql/pgsql.contribution';
 import { ROUTES } from '../constants/routes';
 import { getQuestion, submitQuery } from '../api/question';
 import type { QuestionDto } from '../types/question';
-import { IconDownload, IconTrophy } from '@tabler/icons-react';
+import { IconDownload, IconHistory, IconTrophy } from '@tabler/icons-react';
 import { AnswerTable } from './AnswerTable';
 import { useUserStore } from '../store/userStore';
 
@@ -129,11 +129,18 @@ export default function Question() {
           <AnswerTable data={answer} />
           <Text>Max timeout: {question.max_timeout}s</Text>
         </Stack>
-        <Link to={ROUTES.LEADERBOARD.replace(':id', id ?? '')}>
-          <Button color="yellow" leftSection={<IconTrophy />}>
-            Leaderboard
-          </Button>
-        </Link>
+        <Flex gap="sm">
+          <Link to={ROUTES.QUESTION_SUBMISSIONS.replace(':id', id ?? '')}>
+            <Button variant="light" leftSection={<IconHistory />}>
+              Submissions
+            </Button>
+          </Link>
+          <Link to={ROUTES.LEADERBOARD.replace(':id', id ?? '')}>
+            <Button variant="light" color="yellow" leftSection={<IconTrophy />}>
+              Leaderboard
+            </Button>
+          </Link>
+        </Flex>
       </Stack>
       <Stack flex={1}>
         <Editor
