@@ -20,9 +20,7 @@ const HomePage = () => {
       .catch((error) => {
         console.error('Error fetching question count:', error);
       });
-  }, []);
 
-  useEffect(() => {
     getQuestions(currentPage)
       .then((data) => {
         setLoading(false);
@@ -31,7 +29,20 @@ const HomePage = () => {
       .catch((error) => {
         console.error('Error fetching questions:', error);
       });
-  }, [currentPage]);
+  }, []);
+
+  const handleChangePage = (newPage: number) => {
+    setLoading(true);
+    getQuestions(newPage)
+      .then((data) => {
+        setLoading(false);
+        setQuestions(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching questions:', error);
+      });
+    setCurrentPage(newPage);
+  };
 
   const rows = questions.map((qn) => (
     <Table.Tr key={qn.id}>
@@ -70,7 +81,7 @@ const HomePage = () => {
               <Table.Th>Actions</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          {!isloading && <Table.Tbody>{rows}</Table.Tbody>}
           {isloading && (
             <Table.Caption>
               <Loader color="blue" />
@@ -81,7 +92,7 @@ const HomePage = () => {
         <Pagination
           total={Math.ceil(totalQuestionCount / ITEMS_PER_PAGE)}
           value={currentPage}
-          onChange={setCurrentPage}
+          onChange={handleChangePage}
         />
       </Flex>
     </div>
