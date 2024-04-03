@@ -4,9 +4,8 @@ import { CreateQuestionDto } from '../types/question';
 import { createQuestion } from '../api/questions';
 import { notifications } from '@mantine/notifications';
 
-
 const AddQuestion = () => {
-  const [password, setPassword] = useState<string>("");
+  const [password, setPassword] = useState<string>('');
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [incorrectPassword, setIncorrectPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,7 +43,6 @@ const AddQuestion = () => {
           answer_data: '',
           max_timeout: 0,
         });
-        
       } else {
         notifications.show({
           title: 'Error',
@@ -62,8 +60,11 @@ const AddQuestion = () => {
       setLoading(false);
     }
   };
-  
-  const handleChange = (key: keyof CreateQuestionDto, value: string | number) => {
+
+  const handleChange = (
+    key: keyof CreateQuestionDto,
+    value: string | number,
+  ) => {
     setFormData((prevData) => ({
       ...prevData,
       [key]: value,
@@ -71,7 +72,7 @@ const AddQuestion = () => {
   };
 
   const handlePasswordSubmit = () => {
-    if (password === "abc") {
+    if (password === process.env.REACT_APP_PASSWORD) {
       setAuthenticated(true);
     } else {
       setIncorrectPassword(true);
@@ -80,9 +81,9 @@ const AddQuestion = () => {
 
   return (
     <>
-    {!authenticated &&
-    <Container size="sm">
-        <h1>You need to be authorised to add questions to the database</h1>
+      {!authenticated && (
+        <Container size="sm">
+          <h1>You need to be authorised to add questions to the database</h1>
           <TextInput
             label="Password"
             type="password"
@@ -94,10 +95,12 @@ const AddQuestion = () => {
             style={{ marginBottom: '15px' }}
           />
           <Button onClick={() => handlePasswordSubmit()}>Submit</Button>
-      </Container>
-    }
+        </Container>
+      )}
 
-    {authenticated && (loading ? <div
+      {authenticated &&
+        (loading ? (
+          <div
             style={{
               position: 'absolute',
               top: '50%',
@@ -106,73 +109,79 @@ const AddQuestion = () => {
             }}
           >
             <Loader />
-          </div> : 
-    <Container size="sm">
-    <h1>Create Question</h1>
-    <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-      <TextInput
-        label="Question Name"
-        placeholder="Enter question name"
-        required
-        value={formData.question_name}
-        onChange={(e) => handleChange('question_name', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <TextInput
-        label="Schema Name"
-        placeholder="Enter schema name"
-        required
-        value={formData.schema_name}
-        onChange={(e) => handleChange('schema_name', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <Textarea
-        label="Description"
-        placeholder="Enter description"
-        required
-        value={formData.description}
-        onChange={(e) => handleChange('description', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <Textarea
-        label="Create Table Statements"
-        placeholder="Enter question schema"
-        required
-        value={formData.question_schema}
-        onChange={(e) => handleChange('question_schema', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <TextInput
-        label="Insert Value Statements"
-        placeholder="Enter question data"
-        required
-        value={formData.question_data}
-        onChange={(e) => handleChange('question_data', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <TextInput
-        label="Sample Answer Query"
-        placeholder="Enter a query that will retrieve the correct answers"
-        required
-        value={formData.sample_answer}
-        onChange={(e) => handleChange('sample_answer', e.target.value)}
-        style={{ marginBottom: '15px' }}
-      />
-      <TextInput
-        label="Max Timeout"
-        type="number"
-        placeholder="Enter max timeout"
-        required
-        value={formData.max_timeout}
-        onChange={(e) => handleChange('max_timeout', Number(e.target.value))}
-        style={{ marginBottom: '15px' }}
-      />
-      <Button type="submit" style={{ marginTop: '15px' }}>Submit</Button>
-    </form>
-  </Container>)
-  }
-
-  </>
+          </div>
+        ) : (
+          <Container size="sm">
+            <h1>Create Question</h1>
+            <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
+              <TextInput
+                label="Question Name"
+                placeholder="Enter question name"
+                required
+                value={formData.question_name}
+                onChange={(e) => handleChange('question_name', e.target.value)}
+                style={{ marginBottom: '15px' }}
+              />
+              <TextInput
+                label="Schema Name"
+                placeholder="Enter schema name"
+                required
+                value={formData.schema_name}
+                onChange={(e) => handleChange('schema_name', e.target.value)}
+                style={{ marginBottom: '15px' }}
+              />
+              <Textarea
+                label="Description"
+                placeholder="Enter description"
+                required
+                value={formData.description}
+                onChange={(e) => handleChange('description', e.target.value)}
+                style={{ marginBottom: '15px' }}
+              />
+              <Textarea
+                label="Create Table Statements"
+                placeholder="Enter question schema"
+                required
+                value={formData.question_schema}
+                onChange={(e) =>
+                  handleChange('question_schema', e.target.value)
+                }
+                style={{ marginBottom: '15px' }}
+              />
+              <TextInput
+                label="Insert Value Statements"
+                placeholder="Enter question data"
+                required
+                value={formData.question_data}
+                onChange={(e) => handleChange('question_data', e.target.value)}
+                style={{ marginBottom: '15px' }}
+              />
+              <TextInput
+                label="Sample Answer Query"
+                placeholder="Enter a query that will retrieve the correct answers"
+                required
+                value={formData.sample_answer}
+                onChange={(e) => handleChange('sample_answer', e.target.value)}
+                style={{ marginBottom: '15px' }}
+              />
+              <TextInput
+                label="Max Timeout"
+                type="number"
+                placeholder="Enter max timeout"
+                required
+                value={formData.max_timeout}
+                onChange={(e) =>
+                  handleChange('max_timeout', Number(e.target.value))
+                }
+                style={{ marginBottom: '15px' }}
+              />
+              <Button type="submit" style={{ marginTop: '15px' }}>
+                Submit
+              </Button>
+            </form>
+          </Container>
+        ))}
+    </>
   );
 };
 
