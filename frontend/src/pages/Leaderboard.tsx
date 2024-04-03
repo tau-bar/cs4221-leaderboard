@@ -83,6 +83,7 @@ const Leaderboard = () => {
       minute: '2-digit',
       second: '2-digit',
       hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // use user's timezone
     };
 
     // Using toLocaleString to combine date and time formatting in one go
