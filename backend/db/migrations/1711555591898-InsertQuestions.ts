@@ -22,7 +22,7 @@ export class InsertQuestions1711555591898 implements MigrationInterface {
             ]);
         }
 
-        await queryRunner.query(`ALTER SEQUENCE admin.question_id_seq RESTART WITH 11`);
+        //await queryRunner.query(`ALTER SEQUENCE admin.question_id_seq RESTART WITH 11`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
